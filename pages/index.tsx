@@ -17,12 +17,12 @@ type InputAndCursorPos = { input: string; cursorPos: number };
  * @note use minLength & maxLength to limit the quote length
  * @default_URL : https://api.quotable.io/random?minLength=100&maxLength=140
  */
-const getData = async arg_state => {
-  fetch("/api/typing/300")
+const getData = async (arg_state: React.Dispatch<React.SetStateAction<Data>>) => {
+  fetch("/api/typing/10")
     .then(response => response.json())
     .then(data => {
-      console.log(data);
       // data.content = "People.";
+      data.quote = "People.";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -66,8 +66,11 @@ const getData = async arg_state => {
           charColor: "text-gray-500",
         });
       });
+      /**
+       * @stateChange : this will change the state that contains the data
+       */
 
-      arg_state(temArray); // ? this will set the state as an array of characters
+      arg_state(temArray);
     })
     .catch(err => console.error(err));
 };
@@ -75,27 +78,56 @@ const getData = async arg_state => {
 // verify if key is a character
 
 export default function Home() {
-  /**
-   * the follwwing state will is type of
-   * @type [[string[]],[{char:string,charColor:string}]]
-   */
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
   const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null);
+  const [roundCounter, setRoundCounter] = useState(0);
   const [inputAndCursorPos, setInputAndCursorPos] = useState<InputAndCursorPos>(
     { input: "", cursorPos: 0 } // if input is "abc" cursorPos is 3, so to remove b index is 1 that means cursorPos - 2
   );
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
-    if (myText[0].length === 0) {
+    if (myText[0].length == 0) {
+      console.log("#useEffect Getting Data.......");
       getData(setMyText); // setMyText is the callback function
     } else if (activeWordWithIndex === null) {
+      console.log("#useEffect setting active word...");
       setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] }); // set the first active word as active after Data is loaded
-      inputRef.current.focus();
+      setRoundCounter(roundCounter + 1);
+      if (!isFinished) {
+        // focus only when input is in the DOM
+        inputRef.current.focus();
+      }
     }
-    console.log("useEffect executed...")
-  }, [myText, activeWordWithIndex]);
+
+    console.log("useEffect executed...");
+  }, [myText, activeWordWithIndex, isFinished, roundCounter]);
+
+
+  // !TODO: add focus to input when restart typing, & add a shortcut for restart without clicking the button 
+
+
+
+
+  // this will handle new round conditions.
+  useEffect(() => {
+    inputRef.current?.focus();
+    setIsFinished(false);
+    console.log("useEffect RoundCounter executed...");
+  }, [roundCounter]);
+  // useEffect(()=>{
+  //   if(!isFinished){
+  //     inputRef.current?.focus();
+  //   }
+  //   console.log("useEffect isFinished executed...");
+  // },[isFinished])
+
+  const restart = () => {
+    getData(setMyText);
+    setActiveWordWithIndex(null);
+  };
 
   const handleOnChangeInput = (input: string, event: React.ChangeEvent<HTMLInputElement>) => {
     /**
@@ -145,7 +177,6 @@ export default function Home() {
     // set the cursor position to next target Char that will be typed of the active word
     for (let i = 0; i < myText[1].length; i++) {
       if (myText[1][i].charColor.localeCompare("text-gray-500") == 0) {
-        console.log("not typed index : ", i);
         myText[2].CursorPosition = i;
         break;
       }
@@ -154,19 +185,26 @@ export default function Home() {
     // Checking if the user finished typing by checking if the last char gray color is changed!
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
+      /**
+       * @note :  next line will prevent from showing the previous text when user restarts
+       *  by checking !(myText[1].length==0) when the DOM is loaded
+       */
+      myText[1] = [];
+      setMyText([...myText]);
       setIsFinished(true);
     }
   };
-
+  console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
-  console.log("data : ", myText);
-  console.log("Active Word : ", activeWordWithIndex);
-  console.log("input : ", inputAndCursorPos.input);
-  console.log("CursorPosition : ", myText[2].CursorPosition);
+  // console.log("data : ", myText);
+  // console.log("Active Word : ", activeWordWithIndex);
+  // console.log("input : ", inputAndCursorPos.input);
+  // console.log("CursorPosition : ", myText[2].CursorPosition);
+
   return (
     <div className="bg-AAprimary h-screen w-full flex items-center">
       <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col space-y-12">
-        {!isFinished && (
+        {!isFinished && !(myText[1].length == 0) && (
           <>
             {" "}
             <div
@@ -175,6 +213,7 @@ export default function Home() {
               onClick={() => inputRef.current.focus()}
             >
               {myText[0].map((word, index) => {
+                console.log("DOM Showing words......");
                 return (
                   <div key={index} className="flex ">
                     {word.word.split("").map((char, i) => {
@@ -251,7 +290,6 @@ export default function Home() {
               py-2 px-4 focus:outline-none "
               onChange={e => {
                 handleOnChangeInput(e.target.value, e);
-                console.log("passed input : ", e.target.value);
               }}
               onKeyDownCapture={e => {
                 // prevent cursor in input from jumping two characters
@@ -268,7 +306,7 @@ export default function Home() {
             <div className="flex items-center">
               <div className="flex flex-col space-y-4">
                 <div className="text-AAsecondary">You finished!!</div>
-                <button onClick={() => {}} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
+                <button onClick={() => restart()} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
                   Restart
                 </button>
               </div>
