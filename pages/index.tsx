@@ -22,7 +22,12 @@ type InputAndCursorPos = { input: string; cursorPos: number };
  * @note use minLength & maxLength to limit the quote length
  * @default_URL : https://api.quotable.io/random?minLength=100&maxLength=140
  */
-const getData = async (arg_state: React.Dispatch<React.SetStateAction<Data>>) => {
+const getData = async (
+  arg_state: React.Dispatch<React.SetStateAction<Data>>,
+  setActiveWordWithIndex: React.Dispatch<React.SetStateAction<ActiveWordWithIndex>>,
+  setRoundCounter: React.Dispatch<React.SetStateAction<number>>,
+  roundCounter: number,
+) => {
   fetch("/api/typing/10")
     .then(response => response.json())
     .then(data => {
@@ -71,50 +76,51 @@ const getData = async (arg_state: React.Dispatch<React.SetStateAction<Data>>) =>
           charColor: "text-gray-500",
         });
       });
+      setRoundCounter(roundCounter + 1);
+      setActiveWordWithIndex({ wordIndex: 0, wordDetail: temArray[0][0] }); // set the first active word as active after Data is loaded
       /**
        * @stateChange : this will change the state that contains the data
        */
-
       arg_state(temArray);
     })
     .catch(err => console.error(err));
 };
 
 // verify if key is a character
-let keyboardEvent ;
+let keyboardEvent;
 
 export default function Home() {
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
   const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null);
-  const [roundCounter, setRoundCounter] = useState(0);
+  const [roundCounter, setRoundCounter] = useState<number>(0);
   const [inputAndCursorPos, setInputAndCursorPos] = useState<InputAndCursorPos>(
     { input: "", cursorPos: 0 } // if input is "abc" cursorPos is 3, so to remove b index is 1 that means cursorPos - 2
   );
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  
 
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
-      getData(setMyText); // setMyText is the callback function
-    } else if (activeWordWithIndex === null) {
-      console.log("#useEffect setting active word...");
-
-      setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] }); // set the first active word as active after Data is loaded
-      setRoundCounter(roundCounter + 1);
-      // focus only when input is in the DOM
-    }
+      getData(setMyText, setActiveWordWithIndex,setRoundCounter,roundCounter); // setMyText is the callback function
+    } 
+    // else if (activeWordWithIndex === null) {
+    //   console.log("#useEffect setting active word...");
+    //   setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] });
+    //   setRoundCounter(roundCounter + 1);
+    //   focus only when input is in the DOM
+    // }
     inputRef.current?.focus();
     console.log("useEffect executed...");
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
-  useEffect(()=>{
+  // what inside in this useEffect will be executed one time only
+  useEffect(() => {
     // assign keyboardEvent here, this will be used to remove the event listener later if restarted
-    keyboardEvent=(e:KeyboardEvent) => {
+    keyboardEvent = (e: KeyboardEvent) => {
       console.log("KeyDown Detected : ", e.code);
       if ((e.metaKey || e.ctrlKey) && e.code === "KeyJ") {
         restart();
@@ -122,7 +128,7 @@ export default function Home() {
       }
     };
     console.log("useEffect keyboardEvent");
-  },[])
+  }, []);
   useEffect(() => {
     if (isFinished) {
       document.addEventListener("keydown", keyboardEvent);
@@ -136,10 +142,10 @@ export default function Home() {
 
   // this will handle new round conditions.
   useEffect(() => {
-    setIsFinished(false);// set isFinished to false each time roundCounter changes that means each new round
+    setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
-  
+
   // useEffect(()=>{
   //   if(!isFinished){
   //     inputRef.current?.focus();
@@ -148,7 +154,7 @@ export default function Home() {
   // },[isFinished])
 
   const restart = () => {
-    getData(setMyText);
+    getData(setMyText,setActiveWordWithIndex,setRoundCounter,roundCounter);
     setActiveWordWithIndex(null);
   };
 
@@ -332,9 +338,9 @@ export default function Home() {
             <section className="w-full h-auto flex flex-row space-x-12 justify-center items-center">
               {/* Shortcuts mention */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.6 }}
                 className="flex flex-col items-center text-gray-500 hover:text-AAsecondary duration-300"
               >
                 <span className="">Windows : Ctrl + i</span>
@@ -345,9 +351,9 @@ export default function Home() {
               <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
               {/* Restart part */}
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.6 }}
                 onClick={() => {
                   console.log("Restarted By a click!!!!");
                   restart();
