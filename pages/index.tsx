@@ -133,7 +133,7 @@ export default function Home() {
       }
     };
     console.log("useEffect keyboardEvent");
-  }, []);
+  }, [restart]);
   useEffect(() => {
     if (isFinished) {
       document.addEventListener("keydown", keyboardEvent);
