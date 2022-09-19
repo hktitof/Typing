@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+// type KeyboardEvent = {
+//   metaKey: boolean;
+//   ctrlKey: boolean;
+//   code: string;
+// };
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -22,7 +27,7 @@ const getData = async (arg_state: React.Dispatch<React.SetStateAction<Data>>) =>
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      data.quote = "People.";
+      // data.quote = "tim. tim.";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -76,6 +81,7 @@ const getData = async (arg_state: React.Dispatch<React.SetStateAction<Data>>) =>
 };
 
 // verify if key is a character
+let keyboardEvent ;
 
 export default function Home() {
   // ? this will be an array of characters for now
@@ -87,6 +93,7 @@ export default function Home() {
   );
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  
 
   useEffect(() => {
     if (myText[0].length == 0) {
@@ -94,29 +101,45 @@ export default function Home() {
       getData(setMyText); // setMyText is the callback function
     } else if (activeWordWithIndex === null) {
       console.log("#useEffect setting active word...");
+
       setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] }); // set the first active word as active after Data is loaded
       setRoundCounter(roundCounter + 1);
-      if (!isFinished) {
-        // focus only when input is in the DOM
-        inputRef.current.focus();
-      }
+      // focus only when input is in the DOM
     }
-
+    inputRef.current?.focus();
     console.log("useEffect executed...");
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  useEffect(()=>{
+    // assign keyboardEvent here, this will be used to remove the event listener later if restarted
+    keyboardEvent=(e:KeyboardEvent) => {
+      console.log("KeyDown Detected : ", e.code);
+      if ((e.metaKey || e.ctrlKey) && e.code === "KeyJ") {
+        restart();
+        console.log("Restarted By Shortcut!!!!");
+      }
+    };
+    console.log("useEffect keyboardEvent");
+  },[])
+  useEffect(() => {
+    if (isFinished) {
+      document.addEventListener("keydown", keyboardEvent);
+    } else {
+      document.removeEventListener("keydown", keyboardEvent);
+    }
+    console.log("useEffect add event listener and remove event listener");
+  }, [isFinished]);
 
-
-  // !TODO: add focus to input when restart typing, & add a shortcut for restart without clicking the button 
-
-
-
+  // !TODO: add focus to input when restart typing, & add a shortcut for restart without clicking the button
 
   // this will handle new round conditions.
   useEffect(() => {
-    inputRef.current?.focus();
-    setIsFinished(false);
+    setIsFinished(false);// set isFinished to false each time roundCounter changes that means each new round
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
+  
   // useEffect(()=>{
   //   if(!isFinished){
   //     inputRef.current?.focus();
@@ -149,11 +172,9 @@ export default function Home() {
       }
       targetWordIndexIncrement++;
     }
+    console.log("here....");
     // checks if input is equal to the active word ( true => set inputValue to "" )
-    if (
-      input.localeCompare(activeWordWithIndex.wordDetail.word) == 0 &&
-      input[input.length - 1].localeCompare(" ") == 0
-    ) {
+    if (input.localeCompare(activeWordWithIndex.wordDetail.word) == 0) {
       const nextWordIndex = activeWordWithIndex.wordIndex + 1;
       setActiveWordWithIndex({
         wordIndex: nextWordIndex,
@@ -196,10 +217,10 @@ export default function Home() {
   };
   console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
-  // console.log("data : ", myText);
-  // console.log("Active Word : ", activeWordWithIndex);
-  // console.log("input : ", inputAndCursorPos.input);
-  // console.log("CursorPosition : ", myText[2].CursorPosition);
+  console.log("data : ", myText);
+  console.log("Active Word : ", activeWordWithIndex);
+  console.log("input : ", inputAndCursorPos.input);
+  console.log("CursorPosition : ", myText[2].CursorPosition);
 
   return (
     <div className="bg-AAprimary h-screen w-full flex items-center">
@@ -208,7 +229,6 @@ export default function Home() {
           <>
             {" "}
             <div
-              key={987987}
               className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap"
               onClick={() => inputRef.current.focus()}
             >
@@ -283,42 +303,86 @@ export default function Home() {
             {/**
              * @textInput
              */}
-            <input
-              ref={inputRef}
-              type="text"
-              className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
+            <div className="w-full flex justify-center">
+              <input
+                ref={inputRef}
+                type="text"
+                className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
               py-2 px-4 focus:outline-none "
-              onChange={e => {
-                handleOnChangeInput(e.target.value, e);
-              }}
-              onKeyDownCapture={e => {
-                // prevent cursor in input from jumping two characters
-                if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-                  inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length + 1);
-                  inputRef.current.focus();
-                }
-              }}
-            />
-          </>
-        )}
-        {isFinished && (
-          <>
-            <div className="flex items-center">
-              <div className="flex flex-col space-y-4">
-                <div className="text-AAsecondary">You finished!!</div>
-                <button onClick={() => restart()} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
-                  Restart
-                </button>
-              </div>
+                onChange={e => {
+                  handleOnChangeInput(e.target.value, e);
+                }}
+                onKeyDownCapture={e => {
+                  // prevent cursor in input from jumping two characters
+                  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                    inputRef.current.setSelectionRange(
+                      inputRef.current.value.length,
+                      inputRef.current.value.length + 1
+                    );
+                    inputRef.current.focus();
+                  }
+                }}
+              />
             </div>
           </>
         )}
+        {/* Finished Section */}
+        {isFinished && (
+          <>
+            <section className="w-full h-auto flex flex-row space-x-12 justify-center items-center">
+              {/* Shortcuts mention */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex flex-col items-center text-gray-500 hover:text-AAsecondary duration-300"
+              >
+                <span className="">Windows : Ctrl + i</span>
+                <span className="">Or</span>
+                <span className="">Mac : Cmd + i</span>
+              </motion.div>
+              {/**Separator */}
+              <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
+              {/* Restart part */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+                onClick={() => {
+                  console.log("Restarted By a click!!!!");
+                  restart();
+                }}
+                className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
+              >
+                <div className="h-8 w-8  ">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-8 h-8 text-gray-500 group-hover:text-AAsecondary group-hover:rotate-180 duration-200"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
+                    />
+                  </svg>
+                </div>
+                <span className="text-lg font-mono text-gray-500 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
+                  Restart
+                </span>
+              </motion.div>
+            </section>
+          </>
+        )}
 
-        <div className="w-full flex justify-center flex-col">
+        {/* <div className="w-full flex justify-center flex-col">
           <button onClick={() => {}} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
             Test 1
           </button>
-        </div>
+        </div> */}
       </main>
     </div>
   );
