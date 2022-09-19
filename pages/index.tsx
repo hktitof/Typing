@@ -100,6 +100,11 @@ export default function Home() {
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const restart = () => {
+    getData(setMyText,setActiveWordWithIndex,setRoundCounter,roundCounter);
+    setActiveWordWithIndex(null);
+  };
+
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
@@ -120,7 +125,7 @@ export default function Home() {
   // what inside in this useEffect will be executed one time only
   useEffect(() => {
     // assign keyboardEvent here, this will be used to remove the event listener later if restarted
-    keyboardEvent = (e: KeyboardEvent) => {
+    keyboardEvent = e => {
       console.log("KeyDown Detected : ", e.code);
       if ((e.metaKey || e.ctrlKey) && e.code === "KeyJ") {
         restart();
@@ -153,10 +158,7 @@ export default function Home() {
   //   console.log("useEffect isFinished executed...");
   // },[isFinished])
 
-  const restart = () => {
-    getData(setMyText,setActiveWordWithIndex,setRoundCounter,roundCounter);
-    setActiveWordWithIndex(null);
-  };
+ 
 
   const handleOnChangeInput = (input: string, event: React.ChangeEvent<HTMLInputElement>) => {
     /**
