@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-// type KeyboardEvent = {
-//   metaKey: boolean;
-//   ctrlKey: boolean;
-//   code: string;
-// };
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -99,7 +94,9 @@ export default function Home() {
   );
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const textInputRef = useRef<HTMLDivElement>(null);
+  const absoluteTextINputRef = useRef<HTMLDivElement>(null);
+  const [inputLostFocus, setInputLostFocus] = useState(false);
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
@@ -115,12 +112,6 @@ export default function Home() {
       console.log("#useEffect Getting Data.......");
       getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter); // setMyText is the callback function
     }
-    // else if (activeWordWithIndex === null) {
-    //   console.log("#useEffect setting active word...");
-    //   setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] });
-    //   setRoundCounter(roundCounter + 1);
-    //   focus only when input is in the DOM
-    // }
     inputRef.current?.focus();
     console.log("useEffect executed...");
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
@@ -155,7 +146,15 @@ export default function Home() {
     setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
-
+  useEffect(() => {
+    if (inputLostFocus) {
+      if (absoluteTextINputRef.current?.style && inputLostFocus) {
+        absoluteTextINputRef.current.style.height = textInputRef.current.clientHeight + "px";
+      }
+    }else{
+      inputRef.current?.focus();
+    }
+  }, [inputLostFocus]);
   // useEffect(()=>{
   //   if(!isFinished){
   //     inputRef.current?.focus();
@@ -238,10 +237,21 @@ export default function Home() {
     <div className="bg-AAprimary h-screen w-full flex items-center">
       <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col space-y-12">
         {!isFinished && !(myText[1].length == 0) && (
-          <>
-            {" "}
+          <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8 ">
+            {inputLostFocus && (
+              <div
+                onClick={() => {
+                  setInputLostFocus(false);
+                }}
+                ref={absoluteTextINputRef}
+                className="absolute w-full z-10 bg-AAprimary opacity-90 rounded border-[0.5px] border-gray-700 flex justify-center items-center
+                          hover:cursor-pointer"
+              >
+                <span className="text-gray-300">Click to continue..</span>
+              </div>
+            )}
             <div
-              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap"
+              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap "
               onClick={() => inputRef.current.focus()}
             >
               {myText[0].map((word, index) => {
@@ -317,6 +327,10 @@ export default function Home() {
              */}
             <div className="w-full flex justify-center">
               <input
+                onBlur={() => {
+                  console.log("input lost focus!!");
+                  setInputLostFocus(true);
+                }}
                 ref={inputRef}
                 type="text"
                 className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
@@ -336,7 +350,7 @@ export default function Home() {
                 }}
               />
             </div>
-          </>
+          </div>
         )}
         {/* Finished Section */}
         {isFinished && (
@@ -349,9 +363,9 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="flex flex-col items-center text-gray-500 hover:text-AAsecondary duration-300"
               >
-                <span className="">Windows : Ctrl + i</span>
+                <span className="">Windows : Ctrl + /</span>
                 <span className="">Or</span>
-                <span className="">Mac : Cmd + i</span>
+                <span className="">Mac : Cmd + /</span>
               </motion.div>
               {/**Separator */}
               <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
