@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 // type KeyboardEvent = {
 //   metaKey: boolean;
@@ -87,8 +87,8 @@ const getData = async (
 };
 
 // verify if key is a character
-let keyboardEvent;
 
+let keyboardEvent;
 export default function Home() {
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
@@ -100,10 +100,14 @@ export default function Home() {
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const restart = () => {
+  const restart = useCallback(() => {
     getData(setMyText,setActiveWordWithIndex,setRoundCounter,roundCounter);
     setActiveWordWithIndex(null);
-  };
+    if(inputRef.current?.value){
+      inputRef.current.value = "";
+    }
+  },[roundCounter]);
+
 
   useEffect(() => {
     if (myText[0].length == 0) {
@@ -121,33 +125,36 @@ export default function Home() {
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
   useEffect(() => {
     inputRef.current?.focus();
-  }, []);
-  // what inside in this useEffect will be executed one time only
-  useEffect(() => {
-    // assign keyboardEvent here, this will be used to remove the event listener later if restarted
-    keyboardEvent = e => {
+    keyboardEvent=(e:KeyboardEvent)=>{
       console.log("KeyDown Detected : ", e.code);
-      if ((e.metaKey || e.ctrlKey) && e.code === "KeyJ") {
+      if ((e.metaKey || e.ctrlKey) && e.code === "Slash") {
         restart();
         console.log("Restarted By Shortcut!!!!");
       }
-    };
-    console.log("useEffect keyboardEvent");
+    }
   }, [restart]);
+  
+
+
   useEffect(() => {
     if (isFinished) {
       document.addEventListener("keydown", keyboardEvent);
     } else {
+      console.log("event Removed!!!!!!!!!!")
       document.removeEventListener("keydown", keyboardEvent);
+      
     }
     console.log("useEffect add event listener and remove event listener");
-  }, [isFinished]);
+  }, [isFinished, restart]);
 
-  // !TODO: add focus to input when restart typing, & add a shortcut for restart without clicking the button
+  // !TODO: prevent user from multiple shortcuts cmd + j to restart
 
   // this will handle new round conditions.
   useEffect(() => {
     setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
+    if(inputRef.current?.value){
+      inputRef.current.value = "";
+    }
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
 
@@ -229,6 +236,7 @@ export default function Home() {
   console.log("Active Word : ", activeWordWithIndex);
   console.log("input : ", inputAndCursorPos.input);
   console.log("CursorPosition : ", myText[2].CursorPosition);
+  console.log("rendering Finished-----------------------------")
 
   return (
     <div className="bg-AAprimary h-screen w-full flex items-center">
@@ -241,7 +249,7 @@ export default function Home() {
               onClick={() => inputRef.current.focus()}
             >
               {myText[0].map((word, index) => {
-                console.log("DOM Showing words......");
+                // console.log("DOM Showing words......");
                 return (
                   <div key={index} className="flex ">
                     {word.word.split("").map((char, i) => {
