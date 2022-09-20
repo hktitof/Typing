@@ -237,7 +237,7 @@ export default function Home() {
     <div className="bg-AAprimary h-screen w-full flex items-center">
       <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col space-y-12">
         {!isFinished && !(myText[1].length == 0) && (
-          <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8 ">
+          <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
             {inputLostFocus && (
               <div
                 onClick={() => {
@@ -247,11 +247,11 @@ export default function Home() {
                 className="absolute w-full z-10 bg-AAprimary opacity-90 rounded border-[0.5px] border-gray-700 flex justify-center items-center
                           hover:cursor-pointer"
               >
-                <span className="text-gray-300">Click to continue..</span>
+                <span className="text-gray-400 font-mono">Click to continue..</span>
               </div>
             )}
             <div
-              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap "
+              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap px-2 "
               onClick={() => inputRef.current.focus()}
             >
               {myText[0].map((word, index) => {
