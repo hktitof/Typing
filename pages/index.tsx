@@ -26,7 +26,7 @@ const getData = async (
   arg_state: React.Dispatch<React.SetStateAction<Data>>,
   setActiveWordWithIndex: React.Dispatch<React.SetStateAction<ActiveWordWithIndex>>,
   setRoundCounter: React.Dispatch<React.SetStateAction<number>>,
-  roundCounter: number,
+  roundCounter: number
 ) => {
   fetch("/api/typing/10")
     .then(response => response.json())
@@ -101,19 +101,20 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const restart = useCallback(() => {
-    getData(setMyText,setActiveWordWithIndex,setRoundCounter,roundCounter);
+    console.log("event Listener is Removed!!!!!!!!!!");
+    document.removeEventListener("keydown", keyboardEvent);
+    getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
-    if(inputRef.current?.value){
+    if (inputRef.current?.value) {
       inputRef.current.value = "";
     }
-  },[roundCounter]);
-
+  }, [roundCounter]);
 
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
-      getData(setMyText, setActiveWordWithIndex,setRoundCounter,roundCounter); // setMyText is the callback function
-    } 
+      getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter); // setMyText is the callback function
+    }
     // else if (activeWordWithIndex === null) {
     //   console.log("#useEffect setting active word...");
     //   setActiveWordWithIndex({ wordIndex: 0, wordDetail: myText[0][0] });
@@ -125,24 +126,19 @@ export default function Home() {
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
   useEffect(() => {
     inputRef.current?.focus();
-    keyboardEvent=(e:KeyboardEvent)=>{
+    keyboardEvent = (e: KeyboardEvent) => {
       console.log("KeyDown Detected : ", e.code);
       if ((e.metaKey || e.ctrlKey) && e.code === "Slash") {
         restart();
         console.log("Restarted By Shortcut!!!!");
       }
-    }
+    };
   }, [restart]);
-  
-
 
   useEffect(() => {
     if (isFinished) {
+      console.log("event Listener added!!!");
       document.addEventListener("keydown", keyboardEvent);
-    } else {
-      console.log("event Removed!!!!!!!!!!")
-      document.removeEventListener("keydown", keyboardEvent);
-      
     }
     console.log("useEffect add event listener and remove event listener");
   }, [isFinished, restart]);
@@ -151,10 +147,12 @@ export default function Home() {
 
   // this will handle new round conditions.
   useEffect(() => {
-    setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
-    if(inputRef.current?.value){
+    console.log("event Listener is Removed!!!!!!!!!!");
+    document.removeEventListener("keydown", keyboardEvent);
+    if (inputRef.current?.value) {
       inputRef.current.value = "";
     }
+    setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
 
@@ -164,8 +162,6 @@ export default function Home() {
   //   }
   //   console.log("useEffect isFinished executed...");
   // },[isFinished])
-
- 
 
   const handleOnChangeInput = (input: string, event: React.ChangeEvent<HTMLInputElement>) => {
     /**
@@ -236,7 +232,7 @@ export default function Home() {
   console.log("Active Word : ", activeWordWithIndex);
   console.log("input : ", inputAndCursorPos.input);
   console.log("CursorPosition : ", myText[2].CursorPosition);
-  console.log("rendering Finished-----------------------------")
+  console.log("rendering Finished-----------------------------");
 
   return (
     <div className="bg-AAprimary h-screen w-full flex items-center">
