@@ -27,7 +27,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      // data.quote = "tim. tim.";
+      data.quote = "tim. tim. tim. tim. tim. tim.";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -115,14 +115,7 @@ export default function Home() {
     }
   }, [roundCounter]);
 
-  useEffect(()=>{
-    if(timerIsFinished && myText[1].length > 0){
-      console.log("timer is finished");
-      myText[1] = [];
-      setMyText([...myText]);
-      setIsFinished(false);
-    }
-  },[myText, timerIsFinished])
+  
 
   useEffect(() => {
     if (myText[0].length == 0) {
@@ -275,7 +268,7 @@ export default function Home() {
             {/* Above Text : Timer and Word Per Minute */}
             <div className="w-full flex justify-between pb-8">
               <span className="text-gray-400 text-xl">90 wpm</span>
-              <TimerSpan setRoundCounter={setRoundCounter} setIsFinished={setIsFinished} />
+              <TimerSpan setRoundCounter={setRoundCounter} setIsFinished={setIsFinished} inputLostFocus={inputLostFocus}/>
             </div>
             <div
               className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap px-2 "
@@ -354,10 +347,10 @@ export default function Home() {
              */}
             <div className="w-full flex justify-center">
               <input
-                // onBlur={() => {
-                //   console.log("input lost focus!!");
-                //   setInputLostFocus(true);
-                // }}
+                onBlur={() => {
+                  console.log("input lost focus!!");
+                  setInputLostFocus(true);
+                }}
                 ref={inputRef}
                 type="text"
                 className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 

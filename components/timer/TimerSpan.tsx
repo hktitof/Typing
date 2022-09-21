@@ -1,20 +1,22 @@
-import React from 'react'
-import { useEffect,useRef,useState } from 'react';
-import {motion} from 'framer-motion'
+import React from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 
 let timerCountingInterval;
-export default function TimerSpan({setRoundCounter,setIsFinished})  {
-    const seconds = useRef<number>(2);
-    const [secondsState, setSecondsState] = useState<number>(seconds.current);
-    const timerSpanRef = useRef<HTMLSpanElement>(null);
-    // const restartTimer=useRef(restart);
-    useEffect(() => {
+export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFocus }) {
+  const seconds = useRef<number>(10);
+  const [secondsState, setSecondsState] = useState<number>(seconds.current);
+  const timerSpanRef = useRef<HTMLSpanElement>(null);
+  const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
+  // const restartTimer=useRef(restart);
+  useEffect(() => {
+    if (inputLostFocus) {
+      clearInterval(timerCountingInterval); //clear interval when input is lost focus
+    } else {
       timerCountingInterval = setInterval(() => {
+        console.log("Timer executing...", seconds.current);
         seconds.current--;
-  
-        console.log("executing...", seconds.current);
         setSecondsState(seconds.current);
-  
         // decreasing timer
         if (seconds.current > 60) {
           if (timerSpanRef.current) {
@@ -22,38 +24,53 @@ export default function TimerSpan({setRoundCounter,setIsFinished})  {
           }
         } else if (seconds.current >= 0) {
           if (seconds.current < 10) {
-            if(timerSpanRef.current){
+            if (timerSpanRef.current) {
               timerSpanRef.current.innerText = "0:0" + seconds.current.toString();
             }
           } else {
-            if(timerSpanRef.current){
+            if (timerSpanRef.current) {
               timerSpanRef.current.innerText = "0:" + seconds.current.toString();
             }
           }
         } else {
           // timer is Finished here by it self
-        //   restart();
-        clearInterval(timerCountingInterval);
-        setIsFinished(true);
+          clearInterval(timerCountingInterval);
+          setIsFinished(true);
         }
+
         // timerSpanRef.current.innerText=timerSecCounter.current.toString();
       }, 1000);
-    }, [setIsFinished]);
-    console.log("TimerSpan executed...");
-    console.log("timer : ", seconds);
-    return (
-      <>
-        {secondsState <= 15 && (
-          <motion.span
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 1, repeat: Infinity }}
-            ref={timerSpanRef}
-            className="text-AAError text-xl"
-          >
-            0:15
-          </motion.span>
-        )}
-        {secondsState > 15 && <span ref={timerSpanRef} className="text-gray-400 text-xl"></span>}
-      </>
-    );
-  };
+    }
+  }, [setIsFinished, inputLostFocus]);
+  return (
+    <>
+      {secondsState <= 5 && (
+        <motion.span
+          initial={{ opacity: 1 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 0.5, repeat: Infinity }}
+          ref={timerSpanRef}
+          className="text-AAError text-xl"
+        >
+          0:05
+        </motion.span>
+      )}
+      {secondsState <= 15 && secondsState > 5 && (
+        <motion.span
+          initial={{ opacity: 1 }}
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          ref={timerSpanRef}
+          className="text-AAError text-xl"
+        >
+          0:15
+        </motion.span>
+      )}
+      {secondsState > 15 && (
+        <span ref={timerSpanRef} className="text-gray-400 text-xl">
+          0:20
+        </span>
+      )}
+    </>
+  );
+}
