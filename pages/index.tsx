@@ -81,9 +81,15 @@ const getData = async (
     .catch(err => console.error(err));
 };
 
+import TimerSpan from "../components/timer/TimerSpan";
+
 // verify if key is a character
 
 let keyboardEvent;
+let timerCountingInterval;
+const finished=()=>{
+  console.log("finished.....!!!!!");
+}
 export default function Home() {
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
@@ -97,6 +103,8 @@ export default function Home() {
   const textInputRef = useRef<HTMLDivElement>(null);
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
+  const [timerIsFinished, setTimerIsFinished] = useState(false);
+
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
@@ -107,6 +115,15 @@ export default function Home() {
     }
   }, [roundCounter]);
 
+  useEffect(()=>{
+    if(timerIsFinished && myText[1].length > 0){
+      console.log("timer is finished");
+      myText[1] = [];
+      setMyText([...myText]);
+      setIsFinished(false);
+    }
+  },[myText, timerIsFinished])
+
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
@@ -115,6 +132,7 @@ export default function Home() {
     inputRef.current?.focus();
     console.log("useEffect executed...");
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
+
   useEffect(() => {
     inputRef.current?.focus();
     keyboardEvent = (e: KeyboardEvent) => {
@@ -134,7 +152,9 @@ export default function Home() {
     console.log("useEffect add event listener and remove event listener");
   }, [isFinished, restart]);
 
-  // !TODO: prevent user from multiple shortcuts cmd + j to restart
+  // !TODO:
+
+  
 
   // this will handle new round conditions.
   useEffect(() => {
@@ -151,7 +171,7 @@ export default function Home() {
       if (absoluteTextINputRef.current?.style && inputLostFocus) {
         absoluteTextINputRef.current.style.height = textInputRef.current.clientHeight + "px";
       }
-    }else{
+    } else {
       inputRef.current?.focus();
     }
   }, [inputLostFocus]);
@@ -225,6 +245,8 @@ export default function Home() {
       setIsFinished(true);
     }
   };
+
+  
   console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
   console.log("data : ", myText);
@@ -250,6 +272,11 @@ export default function Home() {
                 <span className="text-gray-400 font-mono">Click to continue..</span>
               </div>
             )}
+            {/* Above Text : Timer and Word Per Minute */}
+            <div className="w-full flex justify-between pb-8">
+              <span className="text-gray-400 text-xl">90 wpm</span>
+              <TimerSpan setRoundCounter={setRoundCounter} setIsFinished={setIsFinished} />
+            </div>
             <div
               className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap px-2 "
               onClick={() => inputRef.current.focus()}
@@ -327,10 +354,10 @@ export default function Home() {
              */}
             <div className="w-full flex justify-center">
               <input
-                onBlur={() => {
-                  console.log("input lost focus!!");
-                  setInputLostFocus(true);
-                }}
+                // onBlur={() => {
+                //   console.log("input lost focus!!");
+                //   setInputLostFocus(true);
+                // }}
                 ref={inputRef}
                 type="text"
                 className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
