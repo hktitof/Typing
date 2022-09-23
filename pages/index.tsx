@@ -23,11 +23,11 @@ const getData = async (
   setRoundCounter: React.Dispatch<React.SetStateAction<number>>,
   roundCounter: number
 ) => {
-  fetch("/api/typing/10")
+  fetch("/api/typing/300")
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      data.quote = "tim. tim. tim. tim. tim. tim.";
+      // data.quote = "tim. tim. tim. tim. tim. tim.";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {

@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 
 let timerCountingInterval;
 export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFocus }) {
-  const seconds = useRef<number>(10);
+  const seconds = useRef<number>(65);
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
   const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
-  // const restartTimer=useRef(restart);
   useEffect(() => {
     if (inputLostFocus) {
       clearInterval(timerCountingInterval); //clear interval when input is lost focus
@@ -20,7 +19,11 @@ export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFoc
         // decreasing timer
         if (seconds.current > 60) {
           if (timerSpanRef.current) {
-            timerSpanRef.current.innerText = "1:" + (seconds.current - 60).toString();
+            if (seconds.current < 70) {
+              timerSpanRef.current.innerText = "1:0" + (seconds.current - 60).toString();
+            } else {
+              timerSpanRef.current.innerText = "1:" + (seconds.current - 60).toString();
+            }
           }
         } else if (seconds.current >= 0) {
           if (seconds.current < 10) {
@@ -29,7 +32,11 @@ export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFoc
             }
           } else {
             if (timerSpanRef.current) {
-              timerSpanRef.current.innerText = "0:" + seconds.current.toString();
+              if (seconds.current == 60) {
+                timerSpanRef.current.innerText = "1:00";
+              } else {
+                timerSpanRef.current.innerText = "0:" + seconds.current.toString();
+              }
             }
           }
         } else {
