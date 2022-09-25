@@ -3,8 +3,27 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 let timerCountingInterval;
+const getMinutesAndSeconds = (secondsCounts: number) => {
+  if (secondsCounts >= 60) {
+    const minutes = Math.floor(secondsCounts / 60);
+    const secondsUnits = secondsCounts - minutes * 60;
+    if (secondsUnits > 9) {
+      const secondsUnit = Math.floor(secondsUnits / 10);
+      return [minutes, secondsUnit, secondsUnits - secondsUnit * 10];
+    } else {
+      return [minutes, 0, secondsUnits];
+    }
+  } else {
+    if (secondsCounts > 9) {
+      const secondsTen = Math.floor(secondsCounts / 10);
+      return [0, secondsTen, secondsCounts - secondsTen * 10];
+    } else {
+      return [0, 0, secondsCounts];
+    }
+  }
+};
 export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFocus }) {
-  const seconds = useRef<number>(65);
+  const seconds = useRef<number>(30);
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
   const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
@@ -16,36 +35,17 @@ export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFoc
         console.log("Timer executing...", seconds.current);
         seconds.current--;
         setSecondsState(seconds.current);
-        // decreasing timer
-        if (seconds.current > 60) {
+
+        if (seconds.current >= 0) {
           if (timerSpanRef.current) {
-            if (seconds.current < 70) {
-              timerSpanRef.current.innerText = "1:0" + (seconds.current - 60).toString();
-            } else {
-              timerSpanRef.current.innerText = "1:" + (seconds.current - 60).toString();
-            }
-          }
-        } else if (seconds.current >= 0) {
-          if (seconds.current < 10) {
-            if (timerSpanRef.current) {
-              timerSpanRef.current.innerText = "0:0" + seconds.current.toString();
-            }
-          } else {
-            if (timerSpanRef.current) {
-              if (seconds.current == 60) {
-                timerSpanRef.current.innerText = "1:00";
-              } else {
-                timerSpanRef.current.innerText = "0:" + seconds.current.toString();
-              }
-            }
+            const [minutes, secondsTen, secondsUnit] = getMinutesAndSeconds(seconds.current);
+            timerSpanRef.current.innerText = `${minutes}:${secondsTen}${secondsUnit}`;
           }
         } else {
           // timer is Finished here by it self
           clearInterval(timerCountingInterval);
           setIsFinished(true);
         }
-
-        // timerSpanRef.current.innerText=timerSecCounter.current.toString();
       }, 1000);
     }
   }, [setIsFinished, inputLostFocus]);
@@ -75,7 +75,7 @@ export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFoc
       )}
       {secondsState > 15 && (
         <span ref={timerSpanRef} className="text-gray-400 text-xl">
-          0:20
+          
         </span>
       )}
     </>
