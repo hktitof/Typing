@@ -86,6 +86,7 @@ import TimerSpan from "../components/timer/TimerSpan";
 // verify if key is a character
 
 let keyboardEvent;
+let eventInputLostFocus;
 let timerCountingInterval;
 const finished=()=>{
   console.log("finished.....!!!!!");
@@ -116,7 +117,22 @@ export default function Home() {
   }, [roundCounter]);
 
   
+  // add event listener to track window size to change inputLostFocus Element height
+  useEffect(()=>{
+    if(inputLostFocus){
+      eventInputLostFocus=()=>{
+        console.log("window is resized..Changing inputLostFocus height");
+        if (absoluteTextINputRef.current?.style && inputLostFocus) {
+          absoluteTextINputRef.current.style.height = textInputRef.current.clientHeight + "px";
+        }
+      }
+      window.addEventListener("resize",eventInputLostFocus);
+    }else{
+      window.removeEventListener("resize",eventInputLostFocus);
+    }
+    
 
+  },[inputLostFocus])
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
@@ -168,6 +184,7 @@ export default function Home() {
       inputRef.current?.focus();
     }
   }, [inputLostFocus]);
+  
   // useEffect(()=>{
   //   if(!isFinished){
   //     inputRef.current?.focus();
@@ -271,7 +288,7 @@ export default function Home() {
               <TimerSpan setRoundCounter={setRoundCounter} setIsFinished={setIsFinished} inputLostFocus={inputLostFocus}/>
             </div>
             <div
-              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer  flex flex-wrap px-2 "
+              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
               onClick={() => inputRef.current.focus()}
             >
               {myText[0].map((word, index) => {
