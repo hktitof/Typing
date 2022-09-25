@@ -23,7 +23,7 @@ const getData = async (
   setRoundCounter: React.Dispatch<React.SetStateAction<number>>,
   roundCounter: number
 ) => {
-  fetch("/api/typing/300")
+  fetch("/api/typing/10")
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
@@ -88,9 +88,9 @@ import TimerSpan from "../components/timer/TimerSpan";
 let keyboardEvent;
 let eventInputLostFocus;
 let timerCountingInterval;
-const finished=()=>{
+const finished = () => {
   console.log("finished.....!!!!!");
-}
+};
 export default function Home() {
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
@@ -105,10 +105,12 @@ export default function Home() {
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
   const [timerIsFinished, setTimerIsFinished] = useState(false);
-
+  const timeToType = 180;
+  const seconds = useRef<number>(timeToType);
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
+    seconds.current = timeToType;
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
     if (inputRef.current?.value) {
@@ -116,23 +118,21 @@ export default function Home() {
     }
   }, [roundCounter]);
 
-  
   // add event listener to track window size to change inputLostFocus Element height
-  useEffect(()=>{
-    if(inputLostFocus){
-      eventInputLostFocus=()=>{
+  useEffect(() => {
+    if (inputLostFocus) {
+      eventInputLostFocus = () => {
         console.log("window is resized..Changing inputLostFocus height");
         if (absoluteTextINputRef.current?.style && inputLostFocus) {
           absoluteTextINputRef.current.style.height = textInputRef.current.clientHeight + "px";
         }
-      }
-      window.addEventListener("resize",eventInputLostFocus);
-    }else{
-      window.removeEventListener("resize",eventInputLostFocus);
+      };
+      window.addEventListener("resize", eventInputLostFocus);
+    } else {
+      // delete event listener when it's Focused
+      window.removeEventListener("resize", eventInputLostFocus);
     }
-    
-
-  },[inputLostFocus])
+  }, [inputLostFocus]);
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
@@ -163,8 +163,6 @@ export default function Home() {
 
   // !TODO:
 
-  
-
   // this will handle new round conditions.
   useEffect(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
@@ -184,7 +182,7 @@ export default function Home() {
       inputRef.current?.focus();
     }
   }, [inputLostFocus]);
-  
+
   // useEffect(()=>{
   //   if(!isFinished){
   //     inputRef.current?.focus();
@@ -256,7 +254,6 @@ export default function Home() {
     }
   };
 
-  
   console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
   console.log("data : ", myText);
@@ -285,7 +282,12 @@ export default function Home() {
             {/* Above Text : Timer and Word Per Minute */}
             <div className="w-full flex justify-between pb-8">
               <span className="text-gray-400 text-xl">90 wpm</span>
-              <TimerSpan setRoundCounter={setRoundCounter} setIsFinished={setIsFinished} inputLostFocus={inputLostFocus}/>
+              <TimerSpan
+                setIsFinished={setIsFinished}
+                isFinished={isFinished}
+                inputLostFocus={inputLostFocus}
+                seconds={seconds}
+              />
             </div>
             <div
               className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
@@ -437,6 +439,11 @@ export default function Home() {
                   Restart
                 </span>
               </motion.div>
+            </section>
+            {/* Round Details */}
+            <section className="w-full flex flex-col space-y-2 justify-center items-center">
+                <span className="text-xl text-gray-400">round {roundCounter} : </span>
+                <span className="text-xl text-gray-400">Finisihed in {(timeToType - seconds.current).toString()}</span>
             </section>
           </>
         )}

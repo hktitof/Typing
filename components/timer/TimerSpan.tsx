@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 let timerCountingInterval;
+// this will return min and sec Tens and Units
 const getMinutesAndSeconds = (secondsCounts: number) => {
   if (secondsCounts >= 60) {
     const minutes = Math.floor(secondsCounts / 60);
@@ -22,33 +23,38 @@ const getMinutesAndSeconds = (secondsCounts: number) => {
     }
   }
 };
-export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFocus }) {
-  const seconds = useRef<number>(30);
+export default function TimerSpan({ setIsFinished, isFinished, inputLostFocus, seconds }) {
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
-  const [isTimerPaused, setIsTimerPaused] = useState<boolean>(false);
-  useEffect(() => {
-    if (inputLostFocus) {
-      clearInterval(timerCountingInterval); //clear interval when input is lost focus
-    } else {
-      timerCountingInterval = setInterval(() => {
-        console.log("Timer executing...", seconds.current);
-        seconds.current--;
-        setSecondsState(seconds.current);
 
-        if (seconds.current >= 0) {
-          if (timerSpanRef.current) {
-            const [minutes, secondsTen, secondsUnit] = getMinutesAndSeconds(seconds.current);
-            timerSpanRef.current.innerText = `${minutes}:${secondsTen}${secondsUnit}`;
+
+  // !TODO : Fix Timer is executing even if the user is finished typing that means, isFinished is true
+
+  useEffect(() => {
+    if (!isFinished) {
+      if (inputLostFocus) {
+        clearInterval(timerCountingInterval); //clear interval when input is lost focus
+      } else {
+        timerCountingInterval = setInterval(() => {
+          console.log("Timer executing...", seconds.current);
+          if (isFinished) clearInterval(timerCountingInterval);
+          seconds.current--;
+          setSecondsState(seconds.current);
+
+          if (seconds.current >= 0) {
+            if (timerSpanRef.current) {
+              const [minutes, secondsTen, secondsUnit] = getMinutesAndSeconds(seconds.current);
+              timerSpanRef.current.innerText = `${minutes}:${secondsTen}${secondsUnit}`;
+            }
+          } else {
+            // timer is Finished here by it self
+            clearInterval(timerCountingInterval);
+            setIsFinished(true);
           }
-        } else {
-          // timer is Finished here by it self
-          clearInterval(timerCountingInterval);
-          setIsFinished(true);
-        }
-      }, 1000);
+        }, 1000);
+      }
     }
-  }, [setIsFinished, inputLostFocus]);
+  }, [setIsFinished, inputLostFocus, seconds, isFinished]);
   return (
     <>
       {secondsState <= 5 && (
@@ -73,11 +79,7 @@ export default function TimerSpan({ setRoundCounter, setIsFinished, inputLostFoc
           0:15
         </motion.span>
       )}
-      {secondsState > 15 && (
-        <span ref={timerSpanRef} className="text-gray-400 text-xl">
-          
-        </span>
-      )}
+      {secondsState > 15 && <span ref={timerSpanRef} className="text-gray-400 text-xl"></span>}
     </>
   );
 }
