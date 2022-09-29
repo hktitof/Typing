@@ -27,7 +27,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      // data.quote = "tim. tim. tim. tim. tim. tim.";
+      data.quote = "tim. ";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -87,7 +87,7 @@ import TimerSpan from "../components/timer/TimerSpan";
 
 let keyboardEvent;
 let eventInputLostFocus;
-let timerCountingInterval;
+// let timerCountingInterval;
 const finished = () => {
   console.log("finished.....!!!!!");
 };
@@ -105,8 +105,11 @@ export default function Home() {
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
   const [timerIsFinished, setTimerIsFinished] = useState(false);
-  const timeToType = 180;
+  const timeToType = 5;
   const seconds = useRef<number>(timeToType);
+  const timerCountingInterval=useRef();
+
+
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
@@ -251,6 +254,7 @@ export default function Home() {
       myText[1] = [];
       setMyText([...myText]);
       setIsFinished(true);
+      clearInterval(timerCountingInterval.current)
     }
   };
 
@@ -287,6 +291,7 @@ export default function Home() {
                 isFinished={isFinished}
                 inputLostFocus={inputLostFocus}
                 seconds={seconds}
+                timerCountingInterval={timerCountingInterval}
               />
             </div>
             <div
