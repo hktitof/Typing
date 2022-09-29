@@ -23,11 +23,10 @@ const getMinutesAndSeconds = (secondsCounts: number) => {
     }
   }
 };
-export default function TimerSpan({ setIsFinished, isFinished, inputLostFocus, seconds,timerCountingInterval }) {
+export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,timerCountingInterval }) {
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
 
-  // !TODO : Fix Timer is executing even if the user is finished typing that means, isFinished is true
 
   useEffect(() => {
     if (inputLostFocus) {
@@ -38,7 +37,7 @@ export default function TimerSpan({ setIsFinished, isFinished, inputLostFocus, s
         seconds.current--;
         setSecondsState(seconds.current);
 
-        if (seconds.current >= 0) {
+        if (seconds.current > 0) {
           if (timerSpanRef.current) {
             const [minutes, secondsTen, secondsUnit] = getMinutesAndSeconds(seconds.current);
             timerSpanRef.current.innerText = `${minutes}:${secondsTen}${secondsUnit}`;
@@ -50,7 +49,7 @@ export default function TimerSpan({ setIsFinished, isFinished, inputLostFocus, s
         }
       }, 1000);
     }
-  }, [setIsFinished, inputLostFocus, seconds, isFinished, timerCountingInterval]);
+  }, [setIsFinished, inputLostFocus, seconds, timerCountingInterval]);
   return (
     <>
       {secondsState <= 5 && (

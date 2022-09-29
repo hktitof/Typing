@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import StatisticsTab from "../components/statisticsTab/StatisticsTab";
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -107,8 +108,7 @@ export default function Home() {
   const [timerIsFinished, setTimerIsFinished] = useState(false);
   const timeToType = 5;
   const seconds = useRef<number>(timeToType);
-  const timerCountingInterval=useRef();
-
+  const timerCountingInterval = useRef();
 
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
@@ -254,7 +254,7 @@ export default function Home() {
       myText[1] = [];
       setMyText([...myText]);
       setIsFinished(true);
-      clearInterval(timerCountingInterval.current)
+      clearInterval(timerCountingInterval.current);
     }
   };
 
@@ -288,7 +288,6 @@ export default function Home() {
               <span className="text-gray-400 text-xl">90 wpm</span>
               <TimerSpan
                 setIsFinished={setIsFinished}
-                isFinished={isFinished}
                 inputLostFocus={inputLostFocus}
                 seconds={seconds}
                 timerCountingInterval={timerCountingInterval}
@@ -446,9 +445,13 @@ export default function Home() {
               </motion.div>
             </section>
             {/* Round Details */}
-            <section className="w-full flex flex-col space-y-2 justify-center items-center">
-                <span className="text-xl text-gray-400">round {roundCounter} : </span>
-                <span className="text-xl text-gray-400">Finisihed in {(timeToType - seconds.current).toString()}</span>
+            {/* <section className="w-full flex flex-row justify-around"></section> */}
+            <section className="w-full flex flex-col space-y-2">
+              <div className="w-full flex flex-row justify-between px-1">
+                <div className="text-lg text-gray-400">round {roundCounter} : </div>
+                <div className="text-lg text-gray-400">You Finished in {(timeToType - seconds.current).toString()}</div>
+              </div>
+              <StatisticsTab />
             </section>
           </>
         )}
