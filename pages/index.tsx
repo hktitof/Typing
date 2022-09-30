@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import StatisticsTab from "../components/statisticsTab/StatisticsTab";
+import TimerSpan from "../components/timer/TimerSpan";
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -14,6 +15,8 @@ type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPositi
 type wordsStatus = [{ word: string; typedStatus: boolean; indexFrom: number; indexTo: number }?];
 type ActiveWordIndex = { index: number; word: string } | null;
 type InputAndCursorPos = { input: string; cursorPos: number };
+type CharAndColor = { char: string; charColor: string };
+type Statistics = [{round:number, wpm:number,accuracy:number}?]
 /**
  * @note use minLength & maxLength to limit the quote length
  * @default_URL : https://api.quotable.io/random?minLength=100&maxLength=140
@@ -28,7 +31,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      data.quote = "tim. ";
+      // data.quote = "tim. ";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -82,16 +85,21 @@ const getData = async (
     .catch(err => console.error(err));
 };
 
-import TimerSpan from "../components/timer/TimerSpan";
-
-// verify if key is a character
+const calculateWpm = (input: CharAndColor[], time: number) => {
+  let cpm = 0;
+  for (let i = 0; i < input.length; i++) {
+    if (input[i].charColor == "text-AAsecondary") {
+      cpm++;
+    } else if (input[i].charColor == "text-gray-500") {
+      break;
+    }
+  }
+  return Math.floor(Math.round((cpm / time) * 60) / 5);
+};
 
 let keyboardEvent;
 let eventInputLostFocus;
 // let timerCountingInterval;
-const finished = () => {
-  console.log("finished.....!!!!!");
-};
 export default function Home() {
   // ? this will be an array of characters for now
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
@@ -106,10 +114,10 @@ export default function Home() {
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
   const [timerIsFinished, setTimerIsFinished] = useState(false);
-  const timeToType = 5;
+  const timeToType = 180;
   const seconds = useRef<number>(timeToType);
   const timerCountingInterval = useRef();
-
+  const [statistics, setStatistics] = useState<Statistics>([]);
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
@@ -247,6 +255,9 @@ export default function Home() {
     // Checking if the user finished typing by checking if the last char gray color is changed!
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
+      // set statistics state
+      statistics.push({round:roundCounter,wpm:calculateWpm(myText[1],180-seconds.current),accuracy:98})
+      setStatistics([...statistics]);
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
        *  by checking !(myText[1].length==0) when the DOM is loaded
@@ -285,7 +296,9 @@ export default function Home() {
             )}
             {/* Above Text : Timer and Word Per Minute */}
             <div className="w-full flex justify-between pb-8">
-              <span className="text-gray-400 text-xl">90 wpm</span>
+              <span className="text-gray-400 text-xl">
+                {seconds.current == 180 ? "0" : calculateWpm(myText[1], 180 - seconds.current)} wpm
+              </span>
               <TimerSpan
                 setIsFinished={setIsFinished}
                 inputLostFocus={inputLostFocus}
@@ -449,9 +462,9 @@ export default function Home() {
             <section className="w-full flex flex-col space-y-2">
               <div className="w-full flex flex-row justify-between px-1">
                 <div className="text-lg text-gray-400">round {roundCounter} : </div>
-                <div className="text-lg text-gray-400">You Finished in {(timeToType - seconds.current).toString()}</div>
+                <div className="text-lg text-gray-400">Finished in {(timeToType - seconds.current).toString()} sec</div>
               </div>
-              <StatisticsTab />
+              <StatisticsTab statistics={statistics} />
             </section>
           </>
         )}
