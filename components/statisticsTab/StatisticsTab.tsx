@@ -2,6 +2,46 @@ import React from "react";
 import { motion } from "framer-motion";
 type Statistics = [{ round: number; wpm: number; accuracy: number }?];
 export default function StatisticsTab({ statistics }: { statistics: Statistics }) {
+  const getTopScore = () => {
+    if (statistics.length > 1) {
+      let topScore = statistics[0].wpm;
+      let topScoreIndex = 0;
+      statistics
+        .slice(0)
+        .reverse()
+        .forEach((item, index) => {
+          if (item.wpm > topScore) {
+            topScore = item.wpm;
+            topScoreIndex = index;
+          }
+        });
+      return topScoreIndex;
+    } else {
+      return null;
+    }
+  };
+  const result = getTopScore();
+  const isTopScore = (index: number) => {
+    if (result == null) {
+      return <></>;
+    } else {
+      return index === result ? (
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ repeat: Infinity, duration: 1 }}
+          className="text-yellow-300"
+        >
+          TopScore
+        </motion.span>
+      ) : (
+        <></>
+      );
+    }
+  };
+
+  // !TODO: fix TopScore not showing up next the right top score
+  console.log("score list : ", statistics);
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto">
@@ -14,10 +54,10 @@ export default function StatisticsTab({ statistics }: { statistics: Statistics }
                     ROUND
                   </th>
                   <th scope="col" className="px-6 py-3 text-xs font-bold text-left text-gray-300 uppercase ">
-                    Cpm
+                    Wpm
                   </th>
                   <th scope="col" className="px-6 py-3 text-xs font-bold text-left text-gray-300 uppercase ">
-                    Accurate
+                    Accuracy
                   </th>
                   {/* <th
                                         scope="col"
@@ -56,13 +96,18 @@ export default function StatisticsTab({ statistics }: { statistics: Statistics }
                         }}
                       >
                         <td className="px-6 py-4 text-sm font-medium  whitespace-nowrap">{item.round}</td>
-                        <td className="px-6 py-4 text-sm  whitespace-nowrap">{item.wpm} wpm</td>
+                        <td className="px-6 py-4 text-sm  whitespace-nowrap">
+                          {item.wpm} wpm {isTopScore(index)}
+                        </td>
+
                         <td className="px-6 py-4 text-sm text-left  whitespace-nowrap">{item.accuracy}%</td>
                       </motion.tr>
                     ) : (
                       <tr>
                         <td className="px-6 py-4 text-sm font-medium  whitespace-nowrap">{item.round}</td>
-                        <td className="px-6 py-4 text-sm  whitespace-nowrap">{item.wpm} wpm</td>
+                        <td className="px-6 py-4 text-sm  whitespace-nowrap">
+                          {item.wpm} wpm {isTopScore(index)}
+                        </td>
                         <td className="px-6 py-4 text-sm text-left  whitespace-nowrap">{item.accuracy}%</td>
                       </tr>
                     );

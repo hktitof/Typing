@@ -96,6 +96,18 @@ const calculateWpm = (input: CharAndColor[], time: number) => {
   }
   return Math.floor(Math.round((cpm / time) * 60) / 5);
 };
+const calculateAccuracy = (input: CharAndColor[]) => {
+  let correct = 0;
+  let incorrect = 0;
+  for (let i = 0; i < input.length; i++) {
+    if (input[i].charColor == "text-AAsecondary") {
+      correct++;
+    } else if (input[i].charColor == "text-AAerror") {
+      incorrect++;
+    }
+  }
+  return Math.floor((correct*100)/input.length);
+}
 
 let keyboardEvent;
 let eventInputLostFocus;
@@ -256,7 +268,7 @@ export default function Home() {
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
       // set statistics state
-      statistics.push({round:roundCounter,wpm:calculateWpm(myText[1],180-seconds.current),accuracy:98})
+      statistics.push({round:roundCounter,wpm:calculateWpm(myText[1],180-seconds.current),accuracy:calculateAccuracy(myText[1])});
       setStatistics([...statistics]);
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
