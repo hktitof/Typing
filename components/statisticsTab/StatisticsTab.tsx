@@ -56,7 +56,7 @@ export default function StatisticsTab({
         <div className="w-full flex justify-center">
           <span className="sm:text-xl text-sm text-gray-400 underline ">Statistics</span>
         </div>
-        <div className="w-full flex flex-row justify-between px-1">
+        <div className="w-full flex flex-row justify-between px-2">
           <div className="sm:text-lg text-sm text-gray-400">round {round.toString()} : </div>
           <div className="sm:text-lg text-sm text-gray-400">Finished in {finishedTime} sec</div>
         </div>

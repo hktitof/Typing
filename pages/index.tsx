@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import StatisticsTab from "../components/statisticsTab/StatisticsTab";
 import TimerSpan from "../components/timer/TimerSpan";
+import About from "../components/AboutComp/About";
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -16,7 +17,7 @@ type wordsStatus = [{ word: string; typedStatus: boolean; indexFrom: number; ind
 type ActiveWordIndex = { index: number; word: string } | null;
 type InputAndCursorPos = { input: string; cursorPos: number };
 type CharAndColor = { char: string; charColor: string };
-type Statistics = [{round:number, wpm:number,accuracy:number}?]
+type Statistics = [{ round: number; wpm: number; accuracy: number }?];
 /**
  * @note use minLength & maxLength to limit the quote length
  * @default_URL : https://api.quotable.io/random?minLength=100&maxLength=140
@@ -31,7 +32,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      // data.quote = "tim. ";
+      data.quote = "j";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -106,8 +107,8 @@ const calculateAccuracy = (input: CharAndColor[]) => {
       incorrect++;
     }
   }
-  return Math.floor((correct*100)/input.length);
-}
+  return Math.floor((correct * 100) / input.length);
+};
 
 let keyboardEvent;
 let eventInputLostFocus;
@@ -268,7 +269,11 @@ export default function Home() {
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
       // set statistics state
-      statistics.push({round:roundCounter,wpm:calculateWpm(myText[1],180-seconds.current),accuracy:calculateAccuracy(myText[1])});
+      statistics.push({
+        round: roundCounter,
+        wpm: calculateWpm(myText[1], 180 - seconds.current),
+        accuracy: calculateAccuracy(myText[1]),
+      });
       setStatistics([...statistics]);
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
@@ -280,6 +285,11 @@ export default function Home() {
       clearInterval(timerCountingInterval.current);
     }
   };
+  const handleHeightCenter=()=>{
+    if(window){
+      return "h-["+window.innerHeight/2+"px]";
+    }
+  }
 
   console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
@@ -290,9 +300,9 @@ export default function Home() {
   console.log("rendering Finished-----------------------------");
 
   return (
-    <div className="bg-AAprimary h-screen  w-full flex flex-col justify-center items-center">
-      <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col space-y-12">
-        {!isFinished && !(myText[1].length == 0) && (
+    <div className={` bg-AAprimary min-h-screen  w-full flex flex-col justify-center items-center ${isFinished ?"pt-48":""}`}>
+      {!isFinished && !(myText[1].length == 0) && (
+        <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col justify-center items-center space-y-12">
           <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
             {inputLostFocus && (
               <div
@@ -419,19 +429,13 @@ export default function Home() {
               />
             </div>
           </div>
-        )}
-        
+        </main>
+      )}
 
-        {/* <div className="w-full flex justify-center flex-col">
-          <button onClick={() => {}} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
-            Test 1
-          </button>
-        </div> */}
-      </main>
       {/* Finished Section */}
       {isFinished && (
-          <>
-            <section className="w-full h-auto flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
+        <>
+        <section className=" w-full h-full flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
               {/* Shortcuts mention */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
@@ -479,15 +483,22 @@ export default function Home() {
             </section>
             {/* Round Details */}
             {/* <section className="w-full flex flex-row justify-around"></section> */}
-            <section className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
+            <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
               {/* <div className="w-full flex flex-row justify-between px-1">
                 <div className="text-lg text-gray-400">round {roundCounter} : </div>
                 <div className="text-lg text-gray-400">Finished in {(timeToType - seconds.current).toString()} sec</div>
               </div> */}
-              <StatisticsTab statistics={statistics} round={roundCounter} finishedTime={(timeToType - seconds.current).toString()} />
+              <StatisticsTab
+                statistics={statistics}
+                round={roundCounter}
+                finishedTime={(timeToType - seconds.current).toString()}
+              />
             </section>
-          </>
-        )}
+            <About/>
+        </>
+            
+
+      )}
     </div>
   );
 }
