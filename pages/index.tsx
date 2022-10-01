@@ -290,7 +290,7 @@ export default function Home() {
   console.log("rendering Finished-----------------------------");
 
   return (
-    <div className="bg-AAprimary h-screen w-full flex items-center">
+    <div className="bg-AAprimary h-screen  w-full flex flex-col justify-center items-center">
       <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col space-y-12">
         {!isFinished && !(myText[1].length == 0) && (
           <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
@@ -308,7 +308,7 @@ export default function Home() {
             )}
             {/* Above Text : Timer and Word Per Minute */}
             <div className="w-full flex justify-between pb-8">
-              <span className="text-gray-400 text-xl">
+              <span className="text-gray-400 md:text-xl text-sm ">
                 {seconds.current == 180 ? "0" : calculateWpm(myText[1], 180 - seconds.current)} wpm
               </span>
               <TimerSpan
@@ -420,10 +420,18 @@ export default function Home() {
             </div>
           </div>
         )}
-        {/* Finished Section */}
-        {isFinished && (
+        
+
+        {/* <div className="w-full flex justify-center flex-col">
+          <button onClick={() => {}} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
+            Test 1
+          </button>
+        </div> */}
+      </main>
+      {/* Finished Section */}
+      {isFinished && (
           <>
-            <section className="w-full h-auto flex flex-row space-x-12 justify-center items-center">
+            <section className="w-full h-auto flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
               {/* Shortcuts mention */}
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
@@ -431,9 +439,9 @@ export default function Home() {
                 transition={{ duration: 0.6 }}
                 className="flex flex-col items-center text-gray-500 hover:text-AAsecondary duration-300"
               >
-                <span className="">Windows : Ctrl + /</span>
-                <span className="">Or</span>
-                <span className="">Mac : Cmd + /</span>
+                <span className="sm:text-base text-xs">Windows : Ctrl + /</span>
+                <span className="sm:text-base text-xs">Or</span>
+                <span className="sm:text-base text-xs">Mac : Cmd + /</span>
               </motion.div>
               {/**Separator */}
               <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
@@ -448,7 +456,7 @@ export default function Home() {
                 }}
                 className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
               >
-                <div className="h-8 w-8  ">
+                <div className="h-8 w-8 ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -464,29 +472,22 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <span className="text-lg font-mono text-gray-500 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
+                <span className="sm:text-lg text-sm font-mono text-gray-500 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
                   Restart
                 </span>
               </motion.div>
             </section>
             {/* Round Details */}
             {/* <section className="w-full flex flex-row justify-around"></section> */}
-            <section className="w-full flex flex-col space-y-2">
-              <div className="w-full flex flex-row justify-between px-1">
+            <section className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
+              {/* <div className="w-full flex flex-row justify-between px-1">
                 <div className="text-lg text-gray-400">round {roundCounter} : </div>
                 <div className="text-lg text-gray-400">Finished in {(timeToType - seconds.current).toString()} sec</div>
-              </div>
-              <StatisticsTab statistics={statistics} />
+              </div> */}
+              <StatisticsTab statistics={statistics} round={roundCounter} finishedTime={(timeToType - seconds.current).toString()} />
             </section>
           </>
         )}
-
-        {/* <div className="w-full flex justify-center flex-col">
-          <button onClick={() => {}} className="w-24 border-2 px-8 py-1 rounded text-sm text-white">
-            Test 1
-          </button>
-        </div> */}
-      </main>
     </div>
   );
 }

@@ -58,8 +58,8 @@ export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,time
           animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 0.5, repeat: Infinity }}
           ref={timerSpanRef}
-          className="text-AAError text-xl"
-        >
+          className="text-AAError md:text-xl text-sm"
+          >
           0:05
         </motion.span>
       )}
@@ -69,12 +69,12 @@ export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,time
           animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
           ref={timerSpanRef}
-          className="text-AAError text-xl"
+          className="text-AAError md:text-xl text-sm"
         >
           0:15
         </motion.span>
       )}
-      {secondsState > 15 && <span ref={timerSpanRef} className="text-gray-400 text-xl"></span>}
+      {secondsState > 15 && <span ref={timerSpanRef} className="text-gray-400 md:text-xl text-sm"></span>}
     </>
   );
 }
