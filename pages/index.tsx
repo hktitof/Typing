@@ -34,7 +34,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      data.quote = "j";
+      // data.quote = "j";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -320,137 +320,138 @@ export default function Home() {
     >
       {!isFinished && !(myText[1].length == 0) && (
         <>
-        
-        <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col justify-center items-center space-y-12">
-          <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
-            {inputLostFocus && (
-              <div
-                onClick={() => {
-                  setInputLostFocus(false);
-                }}
-                ref={absoluteTextINputRef}
-                className="absolute w-full z-10 bg-AAprimary opacity-90 rounded border-[0.5px] border-gray-700 flex justify-center items-center
+          <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col justify-center items-center space-y-12">
+            <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
+              {inputLostFocus && (
+                <div
+                  onClick={() => {
+                    setInputLostFocus(false);
+                  }}
+                  ref={absoluteTextINputRef}
+                  className="absolute w-full z-10 bg-AAprimary opacity-90 rounded border-[0.5px] border-gray-700 flex justify-center items-center
                           hover:cursor-pointer"
-              >
-                <span className="text-gray-400 font-mono">Click to continue..</span>
+                >
+                  <span className="text-gray-400 font-mono">Click to continue..</span>
+                </div>
+              )}
+              {/* Above Text : Timer and Word Per Minute */}
+              <div className="w-full flex justify-between pb-8">
+                <span className="text-gray-400 md:text-xl text-sm ">
+                  {seconds.current == timeToType ? "0" : calculateWpm(myText[1], timeToType - seconds.current)} wpm
+                </span>
+                <TimerSpan
+                  setIsFinished={setIsFinished}
+                  inputLostFocus={inputLostFocus}
+                  seconds={seconds}
+                  timerCountingInterval={timerCountingInterval}
+                  updateStatistics={updateStatistics}
+                />
               </div>
-            )}
-            {/* Above Text : Timer and Word Per Minute */}
-            <div className="w-full flex justify-between pb-8">
-              <span className="text-gray-400 md:text-xl text-sm ">
-                {seconds.current == timeToType ? "0" : calculateWpm(myText[1], timeToType - seconds.current)} wpm
-              </span>
-              <TimerSpan
-                setIsFinished={setIsFinished}
-                inputLostFocus={inputLostFocus}
-                seconds={seconds}
-                timerCountingInterval={timerCountingInterval}
-                updateStatistics={updateStatistics}
-              />
-            </div>
-            <div
-              className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
-              onClick={() => inputRef.current.focus()}
-            >
-              {myText[0].map((word, index) => {
-                // console.log("DOM Showing words......");
-                return (
-                  <div key={index} className="flex ">
-                    {word.word.split("").map((char, i) => {
-                      if (
-                        char.localeCompare(" ") == 0 &&
-                        myText[1][word.indexFrom + i].charColor.localeCompare("text-AAError") == 0
-                      ) {
-                        return (
-                          <div key={i} className={`relative text-AAError`}>
-                            {i + word.indexFrom == myText[2].CursorPosition ? (
-                              <motion.span
-                                initial={{ opacity: 0, x: 0 }}
-                                animate={{ opacity: [1, 0] }}
-                                transition={{
-                                  opacity: { duration: 0.8, repeat: Infinity },
-                                }}
-                                className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
-                              ></motion.span>
-                            ) : (
-                              <></>
-                            )}
-                            _
-                          </div>
-                        );
-                      } else if (char.localeCompare(" ") == 0) {
-                        return (
-                          <div key={i} className="relative ">
-                            {i + word.indexFrom == myText[2].CursorPosition ? (
-                              <motion.span
-                                initial={{ opacity: 0, x: 0 }}
-                                animate={{ opacity: [1, 0] }}
-                                transition={{
-                                  opacity: { duration: 0.8, repeat: Infinity },
-                                }}
-                                className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
-                              ></motion.span>
-                            ) : (
-                              <></>
-                            )}
-                            &nbsp;
-                          </div>
-                        );
-                      } else {
-                        return (
-                          <div key={i} className={`relative ${myText[1][word.indexFrom + i].charColor}`}>
-                            {char}
-                            {i + word.indexFrom == myText[2].CursorPosition ? (
-                              <motion.div
-                                initial={{ opacity: 0, x: 0 }}
-                                animate={{ opacity: [1, 0] }}
-                                transition={{
-                                  opacity: { duration: 0.8, repeat: Infinity },
-                                }}
-                                className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-6 h-4 rounded bg-AAsecondary "
-                              ></motion.div>
-                            ) : (
-                              <></>
-                            )}
-                          </div>
-                        );
-                      }
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-            {/**
-             * @textInput
-             */}
-            <div className="w-full flex justify-center">
-              <input
-                onBlur={() => {
-                  console.log("input lost focus!!");
-                  setInputLostFocus(true);
-                }}
-                ref={inputRef}
-                type="text"
-                className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
+              <div
+                className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
+                onClick={() => inputRef.current.focus()}
+              >
+                {myText[0].map((word, index) => {
+                  // console.log("DOM Showing words......");
+                  return (
+                    <div key={index} className="flex ">
+                      {word.word.split("").map((char, i) => {
+                        if (
+                          char.localeCompare(" ") == 0 &&
+                          myText[1][word.indexFrom + i].charColor.localeCompare("text-AAError") == 0
+                        ) {
+                          return (
+                            <div key={i} className={`relative text-AAError`}>
+                              {i + word.indexFrom == myText[2].CursorPosition ? (
+                                <motion.span
+                                  initial={{ opacity: 0, x: 0 }}
+                                  animate={{ opacity: [1, 0] }}
+                                  transition={{
+                                    opacity: { duration: 0.8, repeat: Infinity },
+                                  }}
+                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
+                                ></motion.span>
+                              ) : (
+                                <></>
+                              )}
+                              <div className="relative">
+                                &nbsp; <div className="absolute bottom-0 h-[3px] w-full bg-AAError"></div>
+                              </div>
+                            </div>
+                          );
+                        } else if (char.localeCompare(" ") == 0) {
+                          return (
+                            <div key={i} className="relative ">
+                              {i + word.indexFrom == myText[2].CursorPosition ? (
+                                <motion.span
+                                  initial={{ opacity: 0, x: 0 }}
+                                  animate={{ opacity: [1, 0] }}
+                                  transition={{
+                                    opacity: { duration: 0.8, repeat: Infinity },
+                                  }}
+                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
+                                ></motion.span>
+                              ) : (
+                                <></>
+                              )}
+                              &nbsp;
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div key={i} className={`relative ${myText[1][word.indexFrom + i].charColor}`}>
+                              {char}
+                              {i + word.indexFrom == myText[2].CursorPosition ? (
+                                <motion.div
+                                  initial={{ opacity: 0, x: 0 }}
+                                  animate={{ opacity: [1, 0] }}
+                                  transition={{
+                                    opacity: { duration: 0.8, repeat: Infinity },
+                                  }}
+                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-6 h-4 rounded bg-AAsecondary "
+                                ></motion.div>
+                              ) : (
+                                <></>
+                              )}
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+              {/**
+               * @textInput
+               */}
+              <div className="w-full flex justify-center">
+                <input
+                  onBlur={() => {
+                    console.log("input lost focus!!");
+                    setInputLostFocus(true);
+                  }}
+                  ref={inputRef}
+                  type="text"
+                  className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
               py-2 px-4 focus:outline-none "
-                onChange={e => {
-                  handleOnChangeInput(e.target.value, e);
-                }}
-                onKeyDownCapture={e => {
-                  // prevent cursor in input from jumping two characters
-                  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-                    inputRef.current.setSelectionRange(
-                      inputRef.current.value.length,
-                      inputRef.current.value.length + 1
-                    );
-                    inputRef.current.focus();
-                  }
-                }}
-              />
+                  onChange={e => {
+                    handleOnChangeInput(e.target.value, e);
+                  }}
+                  onKeyDownCapture={e => {
+                    // prevent cursor in input from jumping two characters
+                    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+                      inputRef.current.setSelectionRange(
+                        inputRef.current.value.length,
+                        inputRef.current.value.length + 1
+                      );
+                      inputRef.current.focus();
+                    }
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </main>
-        <Footer className="absolute bottom-0" link="https://github.com/hktitof/Typing" />
+          </main>
+          <Footer className="absolute bottom-0" link="https://github.com/hktitof/Typing" />
         </>
       )}
 
@@ -483,7 +484,7 @@ export default function Home() {
               className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
             >
               <div className="sm:h-8 sm:w-8 h-5 w-5 ">
-              <RestartIcon/>
+                <RestartIcon />
               </div>
               <span className="sm:text-lg text-sm font-mono text-gray-400 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
                 Restart
@@ -507,7 +508,6 @@ export default function Home() {
           <Footer className="pt-16" link="https://github.com/hktitof/Typing" />
         </>
       )}
-    
     </div>
   );
 }
