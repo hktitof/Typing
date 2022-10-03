@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import StatisticsTab from "../components/statisticsTab/StatisticsTab";
 import TimerSpan from "../components/timer/TimerSpan";
-import About from "../components/AboutComp/About";
 import Footer from "../components/Footer/Footer";
-import RestartIcon from "../components/Icons/RestartIcon";
+import TypingStatistics from "../components/Statistics/TypingStatistics";
 import { getData, calculateWpm, calculateAccuracy } from "../components/Functions/functions";
-
+import CursorCarrotComp from "../components/CursorCarotComp/CursorCarotComp";
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -17,29 +15,16 @@ type ActiveWordWithIndex = {
 };
 type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPosition: number }];
 type wordsStatus = [{ word: string; indexFrom: number; indexTo: number }?];
-type CharAndColor = { char: string; charColor: string };
 type Statistics = [{ round: number; wpm: number; accuracy: number }?];
 
-const CursorCarrotComp = () => {
-  return (
-    <motion.span
-      initial={{ opacity: 0, x: 0 }}
-      animate={{ opacity: [1, 0] }}
-      transition={{
-        opacity: { duration: 0.8, repeat: Infinity },
-      }}
-      className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
-    ></motion.span>
-  );
-};
+
 
 let keyboardEvent; // this variable will hold the keyboard event;
 let eventInputLostFocus; //  this variable will hold the event that will be fired when window is resizing & input lost focus
-// let timerCountingInterval;
 export default function Home() {
-  // ? this general state will hold the data
+  //  this general state will hold the data
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
-  // ? this state will hold the active word index and the word details
+  // this state will hold the active word index and the word details
   const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null);
   const [roundCounter, setRoundCounter] = useState<number>(0);
   const [isFinished, setIsFinished] = useState(false);
@@ -52,11 +37,11 @@ export default function Home() {
   const timerCountingInterval = useRef(); // this useRef will hold the interval used in TimerSpan Component
   const [statistics, setStatistics] = useState<Statistics>([]); // this state will hold the statistics after user finish typing
 
-  // ? this restart will be assigned again in each render only when roundCounter increase
+  //  this restart will be assigned again in each render only when roundCounter increase
   const restart = useCallback(() => {
-    console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
-    seconds.current = timeToType;
+    console.log("event Listener is Removed!!!!!!!!!!");
+    seconds.current = timeToType;// update the seconds to default value again
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
     if (inputRef.current?.value) {
@@ -64,7 +49,7 @@ export default function Home() {
     }
   }, [roundCounter]);
 
-  // ?update Statistics state
+  // update Statistics state
   const updateStatistics = useCallback(() => {
     statistics.push({
       round: roundCounter,
@@ -89,6 +74,7 @@ export default function Home() {
       window.removeEventListener("resize", eventInputLostFocus);
     }
   }, [inputLostFocus]);
+  // this useEffect will be called when the component is rendered for the first time and will keep focus on input
   useEffect(() => {
     if (myText[0].length == 0) {
       console.log("#useEffect Getting Data.......");
@@ -97,7 +83,7 @@ export default function Home() {
     inputRef.current?.focus();
     console.log("useEffect executed...");
   }, [myText, activeWordWithIndex, isFinished, roundCounter]);
-
+  // this useEffect will be called each time restart is changed, it will initialize the keyboard event
   useEffect(() => {
     inputRef.current?.focus();
     keyboardEvent = (e: KeyboardEvent) => {
@@ -141,7 +127,7 @@ export default function Home() {
     /**
      * @nextForLoop
      * this for loop to give the char its default color back, starting from activeWord first char index
-     * this for loop will help  when user delete a character
+     * this loop will help  when user delete a character
      */
     for (let j = activeWordWithIndex.wordDetail.indexFrom; j < myText[1].length; j++) {
       myText[1][j].charColor = "text-gray-500";
@@ -150,14 +136,15 @@ export default function Home() {
     // start validating from this index CharIndex initial
     let targetWordIndexIncrement = activeWordWithIndex.wordDetail.indexFrom;
     for (let i = 0; i < input.length; i++) {
-      if (input[i] === myText[1][targetWordIndexIncrement].char) {
-        myText[1][targetWordIndexIncrement].charColor = "text-AAsecondary";
-      } else {
-        myText[1][targetWordIndexIncrement].charColor = "text-AAError";
-      }
+      myText[1][targetWordIndexIncrement].charColor =
+        input[i] === myText[1][targetWordIndexIncrement].char ? "text-AAsecondary" : "text-AAError";
+      // if (input[i] === myText[1][targetWordIndexIncrement].char) {
+      //   myText[1][targetWordIndexIncrement].charColor = "text-AAsecondary";
+      // } else {
+      //   myText[1][targetWordIndexIncrement].charColor = "text-AAError";
+      // }
       targetWordIndexIncrement++;
     }
-    console.log("here....");
     // checks if input is equal to the active word ( true => set inputValue to "" )
     if (input.localeCompare(activeWordWithIndex.wordDetail.word) == 0) {
       const nextWordIndex = activeWordWithIndex.wordIndex + 1;
@@ -165,22 +152,13 @@ export default function Home() {
         wordIndex: nextWordIndex,
         wordDetail: myText[0][nextWordIndex],
       });
-      event.target.value = "";
+      event.target.value = ""; // clear the input
     }
 
-    //? INFORMATIONAL : this will set the ActiveWordIndex to next word if user typed last two words incorrectly
-    // if (
-    //   input.length == activeWordWithIndex.wordDetail.word.length + myText[0][activeWordWithIndex.wordIndex+1].word.length
-    // ) {
-    //   const nextWordIndex = activeWordWithIndex.wordIndex + 1;
-    //   setActiveWordWithIndex({
-    //     wordIndex: nextWordIndex,
-    //     wordDetail: myText[0][nextWordIndex],
-    //   });
-    //   event.target.value = "";
-    // }
-
     // set the cursor position to next target Char that will be typed of the active word
+    /**
+     * @note : normal for loop is used here to break the loop
+     */
     for (let i = 0; i < myText[1].length; i++) {
       if (myText[1][i].charColor.localeCompare("text-gray-500") == 0) {
         myText[2].CursorPosition = i;
@@ -191,21 +169,15 @@ export default function Home() {
     // Checking if the user finished typing by checking if the last char gray color is changed!
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
-
-      updateStatistics();
+      updateStatistics(); // update statistics
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
-       *  by checking !(myText[1].length==0) when the DOM is loaded
+       *  by checking !(myText[1].length==0)
        */
       myText[1] = [];
       setMyText([...myText]);
       setIsFinished(true);
-      clearInterval(timerCountingInterval.current);
-    }
-  };
-  const handleHeightCenter = () => {
-    if (window) {
-      return "h-[" + window.innerHeight / 2 + "px]";
+      clearInterval(timerCountingInterval.current); // stop the timer
     }
   };
 
@@ -224,6 +196,7 @@ export default function Home() {
     >
       {!isFinished && !(myText[1].length == 0) && (
         <>
+          {/* Main page / Typing page */}
           <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col justify-center items-center space-y-12">
             <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
               {inputLostFocus && (
@@ -255,22 +228,19 @@ export default function Home() {
                 className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
                 onClick={() => inputRef.current.focus()}
               >
-                {myText[0].map((word, index) => {
+                {myText[0].map((item, index) => {
                   // console.log("DOM Showing words......");
                   return (
                     <div key={index} className="flex ">
-                      {word.word.split("").map((char, i) => {
+                      
+                      {item.word.split("").map((char, i) => {
                         if (
                           char.localeCompare(" ") == 0 &&
-                          myText[1][word.indexFrom + i].charColor.localeCompare("text-AAError") == 0
+                          myText[1][item.indexFrom + i].charColor.localeCompare("text-AAError") == 0
                         ) {
                           return (
                             <div key={i} className={`relative text-AAError`}>
-                              {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <CursorCarrotComp/>
-                              ) : (
-                                <></>
-                              )}
+                              {i + item.indexFrom == myText[2].CursorPosition ? <CursorCarrotComp /> : <></>}
                               <div className="relative">
                                 &nbsp; <div className="absolute bottom-0 h-[3px] w-full bg-AAError"></div>
                               </div>
@@ -279,23 +249,15 @@ export default function Home() {
                         } else if (char.localeCompare(" ") == 0) {
                           return (
                             <div key={i} className="relative ">
-                              {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <CursorCarrotComp/>
-                              ) : (
-                                <></>
-                              )}
+                              {i + item.indexFrom == myText[2].CursorPosition ? <CursorCarrotComp /> : <></>}
                               &nbsp;
                             </div>
                           );
                         } else {
                           return (
-                            <div key={i} className={`relative ${myText[1][word.indexFrom + i].charColor}`}>
+                            <div key={i} className={`relative ${myText[1][item.indexFrom + i].charColor}`}>
                               {char}
-                              {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <CursorCarrotComp/>
-                              ) : (
-                                <></>
-                              )}
+                              {i + item.indexFrom == myText[2].CursorPosition ? <CursorCarrotComp /> : <></>}
                             </div>
                           );
                         }
@@ -342,51 +304,16 @@ export default function Home() {
         </>
       )}
 
-      {/* Finished Section */}
+      {/* Finished Typing Section */}
       {isFinished && (
         <>
-          <section className=" w-full h-full flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
-            {/* Shortcuts mention */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-col items-center text-gray-400 hover:text-AAsecondary duration-300"
-            >
-              <span className="sm:text-base text-xs">Windows : Ctrl + /</span>
-              <span className="sm:text-base text-xs">Or</span>
-              <span className="sm:text-base text-xs">Mac : Cmd + /</span>
-            </motion.div>
-            {/**Separator */}
-            <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
-            {/* Restart part */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              onClick={() => {
-                console.log("Restarted By a click!!!!");
-                restart();
-              }}
-              className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
-            >
-              <div className="sm:h-8 sm:w-8 h-5 w-5 ">
-                <RestartIcon />
-              </div>
-              <span className="sm:text-lg text-sm font-mono text-gray-400 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
-                Restart
-              </span>
-            </motion.div>
-          </section>
-          {/* Round Details */}
-          <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
-            <StatisticsTab
-              statistics={statistics}
-              round={roundCounter}
-              finishedTime={(timeToType - seconds.current).toString()}
-            />
-          </section>
-          <About />
+          <TypingStatistics
+            restart={restart}
+            roundCounter={roundCounter}
+            seconds={seconds}
+            statistics={statistics}
+            timeToType={timeToType}
+          />
           <Footer className="pt-16" link="https://github.com/hktitof/Typing" />
         </>
       )}

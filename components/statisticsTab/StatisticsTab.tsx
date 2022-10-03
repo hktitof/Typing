@@ -3,23 +3,22 @@ import { motion } from "framer-motion";
 
 const getTopScore = (st: Statistics) => {
   if (st.length > 1) {
-    let topScore = st[0].wpm;
+    const statics = [...st.slice(0).reverse()];
+    let topScore = statics[0].wpm;
     let topScoreIndex = 0;
-    st.slice(0)
-      .reverse()
-      .forEach((item, index) => {
-        if (item.wpm > topScore) {
-          topScore = item.wpm;
-          topScoreIndex = index;
-        }
-      });
+    statics.forEach((item, index) => {
+      if (item.wpm > topScore) {
+        topScore = item.wpm;
+        topScoreIndex = index;
+      }
+    });
     return topScoreIndex;
   } else {
     return null;
   }
 };
 
-const isTopScore = (index: number,statistics:Statistics) => {
+const isTopScore = (index: number, statistics: Statistics) => {
   const result = getTopScore(statistics);
   if (result == null) {
     return <></>;
@@ -104,7 +103,7 @@ export default function StatisticsTab({
                         >
                           <td className="px-6 py-4 text-sm font-medium  whitespace-nowrap">{item.round}</td>
                           <td className="px-6 py-4 text-sm flex sm:flex-row  flex-col   whitespace-nowrap">
-                            <span className="sm:order-2 order-1 sm:pl-2">{isTopScore(index,statistics)}</span>
+                            <span className="sm:order-2 order-1 sm:pl-2">{isTopScore(index, statistics)}</span>
                             <span>{item.wpm} wpm </span>
                           </td>
 
@@ -114,7 +113,7 @@ export default function StatisticsTab({
                         <tr key={index}>
                           <td className="px-6 py-4 text-sm font-medium  whitespace-nowrap">{item.round}</td>
                           <td className="px-6 py-4 text-sm flex sm:flex-row flex-col  whitespace-nowrap">
-                            <span className="sm:order-2 order-1 sm:pl-2">{isTopScore(index,statistics)}</span>
+                            <span className="sm:order-2 order-1 sm:pl-2">{isTopScore(index, statistics)}</span>
                             <span>{item.wpm} wpm </span>
                           </td>
                           <td className="px-6 py-4 text-sm text-left  whitespace-nowrap">{item.accuracy}%</td>
