@@ -61,7 +61,7 @@ export default function StatisticsTab({
           <div className="sm:text-base text-sm ">{finishedTime} sec</div>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col duration-400">
         <div className="overflow-x-auto">
           <div className="p-1.5 w-full inline-block align-middle">
             <div className="overflow-hidden border rounded-lg border-gray-500">

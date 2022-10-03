@@ -5,133 +5,54 @@ import TimerSpan from "../components/timer/TimerSpan";
 import About from "../components/AboutComp/About";
 import Footer from "../components/Footer/Footer";
 import RestartIcon from "../components/Icons/RestartIcon";
+import { getData, calculateWpm, calculateAccuracy } from "../components/Functions/functions";
+
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
     word: ReturnType<() => string>;
-    typedStatus: boolean;
     indexFrom: number;
     indexTo: number;
   };
 };
 type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPosition: number }];
-type wordsStatus = [{ word: string; typedStatus: boolean; indexFrom: number; indexTo: number }?];
-type ActiveWordIndex = { index: number; word: string } | null;
-type InputAndCursorPos = { input: string; cursorPos: number };
+type wordsStatus = [{ word: string; indexFrom: number; indexTo: number }?];
 type CharAndColor = { char: string; charColor: string };
 type Statistics = [{ round: number; wpm: number; accuracy: number }?];
-/**
- * @note use minLength & maxLength to limit the quote length
- * @default_URL : https://api.quotable.io/random?minLength=100&maxLength=140
- */
-const getData = async (
-  arg_state: React.Dispatch<React.SetStateAction<Data>>,
-  setActiveWordWithIndex: React.Dispatch<React.SetStateAction<ActiveWordWithIndex>>,
-  setRoundCounter: React.Dispatch<React.SetStateAction<number>>,
-  roundCounter: number
-) => {
-  fetch("/api/typing/10")
-    .then(response => response.json())
-    .then(data => {
-      // data.content = "People.";
-      // data.quote = "j";
-      const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
-      data.quote.split(" ").forEach((item: string, index: number) => {
-        const word = () => {
-          if (data.quote.split(" ").length - 1 == index) {
-            return item;
-          } else {
-            return item + " ";
-          }
-        };
-        wordsAndStatus.push({
-          word: word(),
-          typedStatus: false,
-          indexFrom: 0,
-          indexTo: 0,
-        });
-      });
-      // getting index of the first char and last char in the text.
-      let LastIndex = 0;
-      wordsAndStatus.forEach((item, index) => {
-        if (index == 0) {
-          item.indexFrom = 0;
-          item.indexTo = item.word.length - 1;
-          LastIndex = item.indexTo;
-        } else {
-          item.indexFrom = LastIndex + 1;
-          item.indexTo = item.indexFrom + item.word.length - 1;
-          LastIndex = item.indexTo;
-        }
-      });
-      const temArray: Data = [wordsAndStatus, [], { CursorPosition: 0 }];
 
-      /**
-       * @@explanation for the following action
-       * this will will convert data to array of char then push each char to the tempArray second Array
-       * as objects with background default value ""
-       */
-      data.quote.split("").forEach((item: string, index: number) => {
-        // pushing the char to the tempArray second Array
-        temArray[1].push({
-          char: item,
-          charColor: "text-gray-500",
-        });
-      });
-      setRoundCounter(roundCounter + 1);
-      setActiveWordWithIndex({ wordIndex: 0, wordDetail: temArray[0][0] }); // set the first active word as active after Data is loaded
-      /**
-       * @stateChange : this will change the state that contains the data
-       */
-      arg_state(temArray);
-    })
-    .catch(err => console.error(err));
+const CursorCarrotComp = () => {
+  return (
+    <motion.span
+      initial={{ opacity: 0, x: 0 }}
+      animate={{ opacity: [1, 0] }}
+      transition={{
+        opacity: { duration: 0.8, repeat: Infinity },
+      }}
+      className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
+    ></motion.span>
+  );
 };
 
-const calculateWpm = (input: CharAndColor[], time: number) => {
-  let cpm = 0;
-  for (let i = 0; i < input.length; i++) {
-    if (input[i].charColor == "text-AAsecondary") {
-      cpm++;
-    } else if (input[i].charColor == "text-gray-500") {
-      break;
-    }
-  }
-  return Math.floor(Math.round((cpm / time) * 60) / 5);
-};
-const calculateAccuracy = (input: CharAndColor[]) => {
-  let correct = 0;
-  let incorrect = 0;
-  for (let i = 0; i < input.length; i++) {
-    if (input[i].charColor == "text-AAsecondary") {
-      correct++;
-    } else if (input[i].charColor == "text-AAerror") {
-      incorrect++;
-    }
-  }
-  return Math.floor((correct * 100) / input.length);
-};
-
-let keyboardEvent;
-let eventInputLostFocus;
+let keyboardEvent; // this variable will hold the keyboard event;
+let eventInputLostFocus; //  this variable will hold the event that will be fired when window is resizing & input lost focus
 // let timerCountingInterval;
 export default function Home() {
-  // ? this will be an array of characters for now
+  // ? this general state will hold the data
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
+  // ? this state will hold the active word index and the word details
   const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null);
   const [roundCounter, setRoundCounter] = useState<number>(0);
-  const [inputAndCursorPos, setInputAndCursorPos] = useState<InputAndCursorPos>(
-    { input: "", cursorPos: 0 } // if input is "abc" cursorPos is 3, so to remove b index is 1 that means cursorPos - 2
-  );
   const [isFinished, setIsFinished] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const textInputRef = useRef<HTMLDivElement>(null);
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
-  const timeToType = 180;
-  const seconds = useRef<number>(timeToType);
-  const timerCountingInterval = useRef();
-  const [statistics, setStatistics] = useState<Statistics>([]);
+  const timeToType: number = 180; // default time to type
+  const seconds = useRef<number>(timeToType); // this useRef will hold the remaining seconds to type
+  const timerCountingInterval = useRef(); // this useRef will hold the interval used in TimerSpan Component
+  const [statistics, setStatistics] = useState<Statistics>([]); // this state will hold the statistics after user finish typing
+
+  // ? this restart will be assigned again in each render only when roundCounter increase
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
@@ -143,6 +64,7 @@ export default function Home() {
     }
   }, [roundCounter]);
 
+  // ?update Statistics state
   const updateStatistics = useCallback(() => {
     statistics.push({
       round: roundCounter,
@@ -194,8 +116,6 @@ export default function Home() {
     }
     console.log("useEffect add event listener and remove event listener");
   }, [isFinished, restart]);
-
-  // !TODO:
 
   // this will handle new round conditions.
   useEffect(() => {
@@ -293,11 +213,8 @@ export default function Home() {
   console.log("page re-rendered...");
   console.log("data : ", myText);
   console.log("Active Word : ", activeWordWithIndex);
-  console.log("input : ", inputAndCursorPos.input);
   console.log("CursorPosition : ", myText[2].CursorPosition);
   console.log("rendering Finished-----------------------------");
-
-  // !TODO: handle the case when the timer ends and the user didn't finish typing, so update the statistics state
 
   return (
     <div
@@ -350,14 +267,7 @@ export default function Home() {
                           return (
                             <div key={i} className={`relative text-AAError`}>
                               {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <motion.span
-                                  initial={{ opacity: 0, x: 0 }}
-                                  animate={{ opacity: [1, 0] }}
-                                  transition={{
-                                    opacity: { duration: 0.8, repeat: Infinity },
-                                  }}
-                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
-                                ></motion.span>
+                                <CursorCarrotComp/>
                               ) : (
                                 <></>
                               )}
@@ -370,14 +280,7 @@ export default function Home() {
                           return (
                             <div key={i} className="relative ">
                               {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <motion.span
-                                  initial={{ opacity: 0, x: 0 }}
-                                  animate={{ opacity: [1, 0] }}
-                                  transition={{
-                                    opacity: { duration: 0.8, repeat: Infinity },
-                                  }}
-                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-5 h-4 rounded bg-AAsecondary "
-                                ></motion.span>
+                                <CursorCarrotComp/>
                               ) : (
                                 <></>
                               )}
@@ -389,14 +292,7 @@ export default function Home() {
                             <div key={i} className={`relative ${myText[1][word.indexFrom + i].charColor}`}>
                               {char}
                               {i + word.indexFrom == myText[2].CursorPosition ? (
-                                <motion.div
-                                  initial={{ opacity: 0, x: 0 }}
-                                  animate={{ opacity: [1, 0] }}
-                                  transition={{
-                                    opacity: { duration: 0.8, repeat: Infinity },
-                                  }}
-                                  className="absolute left-0 w-[3px] lg:h-8 sm:bottom-0 top-1 sm:h-6 h-4 rounded bg-AAsecondary "
-                                ></motion.div>
+                                <CursorCarrotComp/>
                               ) : (
                                 <></>
                               )}
@@ -419,10 +315,10 @@ export default function Home() {
                   }}
                   ref={inputRef}
                   type="text"
-                  // ?INFORMATION: uncomment the following line to see the input 
-                  // className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
+                  // ?INFORMATION: uncomment the following line to see the input
+                  // className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600
                   //           py-2 px-4 focus:outline-none "
-                  
+
                   className="w-0 h-0 bg-AAprimary text-xl text-center text-gray-600  border-b-gray-600
                   py-2 px-4 focus:outline-none "
                   onChange={e => {

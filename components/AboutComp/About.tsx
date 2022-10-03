@@ -14,7 +14,7 @@ export default function About() {
         <Img src="titofCercle.png" alt="About picture" className="opacity-80" />
       </div>
       <div className="flex flex-col space-y-8  items-center">
-        <span className="font-extrabold lg:text-5xl md:text-4xl text-2xl sm:text-3xl text-gray-300">
+        <span className="font-extrabold lg:text-5xl md:text-4xl text-2xl sm:text-3xl text-gray-300 text-center">
           What&apos;s this project for?
         </span>
         <span className="font-sans italic  sm:text-base text-sm text-gray-400 text-center">

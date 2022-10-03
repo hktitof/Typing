@@ -2,8 +2,8 @@ import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-// let timerCountingInterval;
-// this will return min and sec Tens and Units
+
+// this will return min and sec Tens and Units example of of seconds is 180 sec return is [3,0,0]
 const getMinutesAndSeconds = (secondsCounts: number) => {
   if (secondsCounts >= 60) {
     const minutes = Math.floor(secondsCounts / 60);
