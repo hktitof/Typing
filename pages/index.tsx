@@ -217,13 +217,6 @@ export default function Home() {
     }
   }, [inputLostFocus]);
 
-  // useEffect(()=>{
-  //   if(!isFinished){
-  //     inputRef.current?.focus();
-  //   }
-  //   console.log("useEffect isFinished executed...");
-  // },[isFinished])
-
   const handleOnChangeInput = (input: string, event: React.ChangeEvent<HTMLInputElement>) => {
     /**
      * @nextForLoop
@@ -278,13 +271,7 @@ export default function Home() {
     // Checking if the user finished typing by checking if the last char gray color is changed!
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
-      // set statistics state
-      // statistics.push({
-      //   round: roundCounter,
-      //   wpm: calculateWpm(myText[1], timeToType - seconds.current),
-      //   accuracy: calculateAccuracy(myText[1]),
-      // });
-      // setStatistics([...statistics]);
+
       updateStatistics();
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
@@ -432,8 +419,12 @@ export default function Home() {
                   }}
                   ref={inputRef}
                   type="text"
-                  className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
-              py-2 px-4 focus:outline-none "
+                  // ?INFORMATION: uncomment the following line to see the input 
+                  // className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600 
+                  //           py-2 px-4 focus:outline-none "
+                  
+                  className="w-0 h-0 bg-AAprimary text-xl text-center text-gray-600  border-b-gray-600
+                  py-2 px-4 focus:outline-none "
                   onChange={e => {
                     handleOnChangeInput(e.target.value, e);
                   }}
@@ -492,12 +483,7 @@ export default function Home() {
             </motion.div>
           </section>
           {/* Round Details */}
-          {/* <section className="w-full flex flex-row justify-around"></section> */}
           <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
-            {/* <div className="w-full flex flex-row justify-between px-1">
-                <div className="text-lg text-gray-400">round {roundCounter} : </div>
-                <div className="text-lg text-gray-400">Finished in {(timeToType - seconds.current).toString()} sec</div>
-              </div> */}
             <StatisticsTab
               statistics={statistics}
               round={roundCounter}
