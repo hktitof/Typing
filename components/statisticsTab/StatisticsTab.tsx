@@ -52,13 +52,13 @@ export default function StatisticsTab({
   console.log("score list : ", statistics);
   return (
     <>
-      <div className="w-full flex flex-col spacey-y-6">
+      <div className="w-full flex flex-col space-y-4">
         <div className="w-full flex justify-center">
           <span className="sm:text-xl text-sm text-gray-400 underline ">Statistics</span>
         </div>
-        <div className="w-full flex flex-row justify-between px-2">
-          <div className="sm:text-lg text-sm text-gray-400">round {round.toString()} : </div>
-          <div className="sm:text-lg text-sm text-gray-400">Finished in {finishedTime} sec</div>
+        <div className="w-full font-mono text-AAsecondary flex flex-row justify-between px-2">
+          <div className="sm:text-base text-sm ">round {round.toString()} : </div>
+          <div className="sm:text-base text-sm ">{finishedTime} sec</div>
         </div>
       </div>
       <div className="flex flex-col">

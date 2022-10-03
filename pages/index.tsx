@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import StatisticsTab from "../components/statisticsTab/StatisticsTab";
 import TimerSpan from "../components/timer/TimerSpan";
 import About from "../components/AboutComp/About";
+import Footer from "../components/Footer/Footer";
 type ActiveWordWithIndex = {
   wordIndex: number;
   wordDetail: {
@@ -126,16 +127,13 @@ export default function Home() {
   const textInputRef = useRef<HTMLDivElement>(null);
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
-  const [timerIsFinished, setTimerIsFinished] = useState(false);
-  const timeToType = 5;
+  const timeToType = 180;
   const seconds = useRef<number>(timeToType);
   const timerCountingInterval = useRef();
   const [statistics, setStatistics] = useState<Statistics>([]);
-  const [timerTerminated,setTimerTerminated]=useState<boolean>(false);
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
-    setTimerTerminated(false);// refresh the timer to it's initial state
     seconds.current = timeToType;
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
@@ -144,14 +142,14 @@ export default function Home() {
     }
   }, [roundCounter]);
 
-  const updateStatistics=useCallback(()=>{
+  const updateStatistics = useCallback(() => {
     statistics.push({
       round: roundCounter,
       wpm: calculateWpm(myText[1], timeToType - seconds.current),
       accuracy: calculateAccuracy(myText[1]),
     });
     setStatistics([...statistics]);
-  },[myText, roundCounter, statistics]);
+  }, [myText, roundCounter, statistics]);
 
   // add event listener to track window size to change inputLostFocus Element height
   useEffect(() => {
@@ -297,11 +295,11 @@ export default function Home() {
       clearInterval(timerCountingInterval.current);
     }
   };
-  const handleHeightCenter=()=>{
-    if(window){
-      return "h-["+window.innerHeight/2+"px]";
+  const handleHeightCenter = () => {
+    if (window) {
+      return "h-[" + window.innerHeight / 2 + "px]";
     }
-  }
+  };
 
   console.log("rounded Count : ", roundCounter);
   console.log("page re-rendered...");
@@ -314,8 +312,14 @@ export default function Home() {
   // !TODO: handle the case when the timer ends and the user didn't finish typing, so update the statistics state
 
   return (
-    <div className={` bg-AAprimary min-h-screen  w-full flex flex-col justify-center items-center ${isFinished ?"pt-48":""}`}>
+    <div
+      className={` bg-AAprimary min-h-screen  w-full flex flex-col justify-center items-center ${
+        isFinished ? "pt-48" : ""
+      }`}
+    >
       {!isFinished && !(myText[1].length == 0) && (
+        <>
+        
         <main className="w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 px-12 flex flex-col justify-center items-center space-y-12">
           <div ref={textInputRef} className="relative w-full h-full flex flex-col space-y-8  ">
             {inputLostFocus && (
@@ -341,8 +345,6 @@ export default function Home() {
                 seconds={seconds}
                 timerCountingInterval={timerCountingInterval}
                 updateStatistics={updateStatistics}
-                timerTerminated={timerTerminated}
-                setTimerTerminated={setTimerTerminated}
               />
             </div>
             <div
@@ -447,75 +449,77 @@ export default function Home() {
             </div>
           </div>
         </main>
+        <Footer className="absolute bottom-0" link="https://github.com/hktitof/Typing" />
+        </>
       )}
 
       {/* Finished Section */}
       {isFinished && (
         <>
-        <section className=" w-full h-full flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
-              {/* Shortcuts mention */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="flex flex-col items-center text-gray-500 hover:text-AAsecondary duration-300"
-              >
-                <span className="sm:text-base text-xs">Windows : Ctrl + /</span>
-                <span className="sm:text-base text-xs">Or</span>
-                <span className="sm:text-base text-xs">Mac : Cmd + /</span>
-              </motion.div>
-              {/**Separator */}
-              <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
-              {/* Restart part */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                onClick={() => {
-                  console.log("Restarted By a click!!!!");
-                  restart();
-                }}
-                className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
-              >
-                <div className="h-8 w-8 ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-8 h-8 text-gray-500 group-hover:text-AAsecondary group-hover:rotate-180 duration-200"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
-                    />
-                  </svg>
-                </div>
-                <span className="sm:text-lg text-sm font-mono text-gray-500 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
-                  Restart
-                </span>
-              </motion.div>
-            </section>
-            {/* Round Details */}
-            {/* <section className="w-full flex flex-row justify-around"></section> */}
-            <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
-              {/* <div className="w-full flex flex-row justify-between px-1">
+          <section className=" w-full h-full flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
+            {/* Shortcuts mention */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex flex-col items-center text-gray-400 hover:text-AAsecondary duration-300"
+            >
+              <span className="sm:text-base text-xs">Windows : Ctrl + /</span>
+              <span className="sm:text-base text-xs">Or</span>
+              <span className="sm:text-base text-xs">Mac : Cmd + /</span>
+            </motion.div>
+            {/**Separator */}
+            <div className="h-8 w-[2px] bg-gray-400 rounded"></div>
+            {/* Restart part */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              onClick={() => {
+                console.log("Restarted By a click!!!!");
+                restart();
+              }}
+              className="group flex flex-row space-x-3 items-center hover:cursor-pointer"
+            >
+              <div className="h-8 w-8 ">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-8 h-8 text-gray-400 group-hover:text-AAsecondary group-hover:rotate-180 duration-200"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3"
+                  />
+                </svg>
+              </div>
+              <span className="sm:text-lg text-sm font-mono text-gray-400 group-hover:text-AAsecondary duration-200 group-hover:translate-x-2">
+                Restart
+              </span>
+            </motion.div>
+          </section>
+          {/* Round Details */}
+          {/* <section className="w-full flex flex-row justify-around"></section> */}
+          <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
+            {/* <div className="w-full flex flex-row justify-between px-1">
                 <div className="text-lg text-gray-400">round {roundCounter} : </div>
                 <div className="text-lg text-gray-400">Finished in {(timeToType - seconds.current).toString()} sec</div>
               </div> */}
-              <StatisticsTab
-                statistics={statistics}
-                round={roundCounter}
-                finishedTime={(timeToType - seconds.current).toString()}
-              />
-            </section>
-            <About/>
+            <StatisticsTab
+              statistics={statistics}
+              round={roundCounter}
+              finishedTime={(timeToType - seconds.current).toString()}
+            />
+          </section>
+          <About />
+          <Footer className="pt-16" link="https://github.com/hktitof/Typing" />
         </>
-            
-
       )}
+    
     </div>
   );
 }

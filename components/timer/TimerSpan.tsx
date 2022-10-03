@@ -29,8 +29,7 @@ export default function TimerSpan({
   seconds,
   timerCountingInterval,
   updateStatistics,
-  timerTerminated,
-  setTimerTerminated,
+  
 }) {
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
