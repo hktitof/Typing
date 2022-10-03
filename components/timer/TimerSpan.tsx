@@ -23,10 +23,18 @@ const getMinutesAndSeconds = (secondsCounts: number) => {
     }
   }
 };
-export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,timerCountingInterval }) {
+export default function TimerSpan({
+  setIsFinished,
+  inputLostFocus,
+  seconds,
+  timerCountingInterval,
+  updateStatistics,
+  timerTerminated,
+  setTimerTerminated,
+}) {
   const [secondsState, setSecondsState] = useState<number>(seconds.current);
   const timerSpanRef = useRef<HTMLSpanElement>(null);
-
+  const [timerFinishedByItSelf,setTimerIsFinishedByItSelf] = useState<boolean>(false);
 
   useEffect(() => {
     if (inputLostFocus) {
@@ -44,12 +52,20 @@ export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,time
           }
         } else {
           // timer is Finished here by it self
-          clearInterval(timerCountingInterval.current);
-          setIsFinished(true);
+          setTimerIsFinishedByItSelf(true);
         }
       }, 1000);
     }
   }, [setIsFinished, inputLostFocus, seconds, timerCountingInterval]);
+
+  useEffect(() => {
+    if (timerFinishedByItSelf == true) {
+      setTimerIsFinishedByItSelf(false);
+      updateStatistics();
+      setIsFinished(true);
+      clearInterval(timerCountingInterval.current);
+    }
+  }, [setIsFinished, timerCountingInterval, timerFinishedByItSelf, updateStatistics]);
   return (
     <>
       {secondsState <= 5 && (
@@ -59,7 +75,7 @@ export default function TimerSpan({ setIsFinished,  inputLostFocus, seconds,time
           transition={{ duration: 0.5, repeat: Infinity }}
           ref={timerSpanRef}
           className="text-AAError md:text-xl text-sm"
-          >
+        >
           0:05
         </motion.span>
       )}

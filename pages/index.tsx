@@ -32,7 +32,7 @@ const getData = async (
     .then(response => response.json())
     .then(data => {
       // data.content = "People.";
-      data.quote = "j";
+      // data.quote = "j";
       const wordsAndStatus: wordsStatus = []; // this aaay will hold the words and their status
       data.quote.split(" ").forEach((item: string, index: number) => {
         const word = () => {
@@ -127,13 +127,15 @@ export default function Home() {
   const absoluteTextINputRef = useRef<HTMLDivElement>(null);
   const [inputLostFocus, setInputLostFocus] = useState(false);
   const [timerIsFinished, setTimerIsFinished] = useState(false);
-  const timeToType = 180;
+  const timeToType = 5;
   const seconds = useRef<number>(timeToType);
   const timerCountingInterval = useRef();
   const [statistics, setStatistics] = useState<Statistics>([]);
+  const [timerTerminated,setTimerTerminated]=useState<boolean>(false);
   const restart = useCallback(() => {
     console.log("event Listener is Removed!!!!!!!!!!");
     document.removeEventListener("keydown", keyboardEvent);
+    setTimerTerminated(false);// refresh the timer to it's initial state
     seconds.current = timeToType;
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
@@ -141,6 +143,15 @@ export default function Home() {
       inputRef.current.value = "";
     }
   }, [roundCounter]);
+
+  const updateStatistics=useCallback(()=>{
+    statistics.push({
+      round: roundCounter,
+      wpm: calculateWpm(myText[1], timeToType - seconds.current),
+      accuracy: calculateAccuracy(myText[1]),
+    });
+    setStatistics([...statistics]);
+  },[myText, roundCounter, statistics]);
 
   // add event listener to track window size to change inputLostFocus Element height
   useEffect(() => {
@@ -269,12 +280,13 @@ export default function Home() {
     if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
       console.log("Player Finished typing!!");
       // set statistics state
-      statistics.push({
-        round: roundCounter,
-        wpm: calculateWpm(myText[1], 180 - seconds.current),
-        accuracy: calculateAccuracy(myText[1]),
-      });
-      setStatistics([...statistics]);
+      // statistics.push({
+      //   round: roundCounter,
+      //   wpm: calculateWpm(myText[1], timeToType - seconds.current),
+      //   accuracy: calculateAccuracy(myText[1]),
+      // });
+      // setStatistics([...statistics]);
+      updateStatistics();
       /**
        * @note :  next line will prevent from showing the previous text when user restarts
        *  by checking !(myText[1].length==0) when the DOM is loaded
@@ -299,6 +311,8 @@ export default function Home() {
   console.log("CursorPosition : ", myText[2].CursorPosition);
   console.log("rendering Finished-----------------------------");
 
+  // !TODO: handle the case when the timer ends and the user didn't finish typing, so update the statistics state
+
   return (
     <div className={` bg-AAprimary min-h-screen  w-full flex flex-col justify-center items-center ${isFinished ?"pt-48":""}`}>
       {!isFinished && !(myText[1].length == 0) && (
@@ -319,13 +333,16 @@ export default function Home() {
             {/* Above Text : Timer and Word Per Minute */}
             <div className="w-full flex justify-between pb-8">
               <span className="text-gray-400 md:text-xl text-sm ">
-                {seconds.current == 180 ? "0" : calculateWpm(myText[1], 180 - seconds.current)} wpm
+                {seconds.current == timeToType ? "0" : calculateWpm(myText[1], timeToType - seconds.current)} wpm
               </span>
               <TimerSpan
                 setIsFinished={setIsFinished}
                 inputLostFocus={inputLostFocus}
                 seconds={seconds}
                 timerCountingInterval={timerCountingInterval}
+                updateStatistics={updateStatistics}
+                timerTerminated={timerTerminated}
+                setTimerTerminated={setTimerTerminated}
               />
             </div>
             <div

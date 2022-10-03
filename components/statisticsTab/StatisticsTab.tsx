@@ -86,6 +86,7 @@ export default function StatisticsTab({
                     .map((item, index) => {
                       return index == 0 ? (
                         <motion.tr
+                          key={index}
                           initial={{ opacity: 0, scale: 0.5 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{
@@ -110,7 +111,7 @@ export default function StatisticsTab({
                           <td className="px-6 py-4 text-sm text-left  whitespace-nowrap">{item.accuracy}%</td>
                         </motion.tr>
                       ) : (
-                        <tr>
+                        <tr key={index}>
                           <td className="px-6 py-4 text-sm font-medium  whitespace-nowrap">{item.round}</td>
                           <td className="px-6 py-4 text-sm flex sm:flex-row flex-col  whitespace-nowrap">
                             <span className="sm:order-2 order-1 sm:pl-2">{isTopScore(index)}</span>
