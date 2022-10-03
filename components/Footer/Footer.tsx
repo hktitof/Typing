@@ -8,7 +8,7 @@ const ClickableIcon = props => {
     <a href={props.href} className="" target={"_blank"} rel="noreferrer">
       <props.Icon
         className={
-          "w-5 h-5 text-gray-400 hover:text-AAsecondary fill-current hover:cursor-pointer"
+          "w-5 h-5 text-gray-400 hover:text-AAsecondary transition duration-800 fill-current hover:cursor-pointer "
         }
       />
     </a>
@@ -17,7 +17,7 @@ const ClickableIcon = props => {
 type Props={link:string,className:string}
 export default function Fotter(props:{link:string,className:string}) {
   return (
-      <div className={` ${props.className} bg-AAprimary flex flex-col justify-center items-center py-8 space-y-4`}>
+      <div className={` ${props.className} bg-AAprimary flex flex-col justify-center items-center py-8 space-y-4 `}>
         {/* // ? Reach me at */}
         <div className="flex flex-row space-x-8">
           <ClickableIcon
@@ -49,7 +49,7 @@ export default function Fotter(props:{link:string,className:string}) {
             <span className="text-xs flex flex-row items-center space-x-2 group-hover:text-AAsecondary">
               <GithubIcon
                 className={
-                  "w-4 h-4 text-gray-400 fill-current group-hover:text-AAsecondary"
+                  "w-4 h-4 text-gray-400 fill-current group-hover:text-AAsecondary duration-800"
                 }
               />
               <span className="">Github</span>

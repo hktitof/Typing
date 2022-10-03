@@ -1,6 +1,6 @@
 import React from 'react'
-
-export default function Img(props) {
+type Props={src:string,alt:string,className:string}
+export default function Img(props:Props) {
   return (
 
         // eslint-disable-next-line @next/next/no-img-element
