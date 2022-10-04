@@ -1,10 +1,17 @@
-import React from "react";
 import { motion } from "framer-motion";
 import StatisticsTab from "../statisticsTab/StatisticsTab";
 import RestartIcon from "../Icons/RestartIcon";
 import About from "../AboutComp/About";
-type Props = { restart; statistics; roundCounter; timeToType; seconds };
-export default function TypingStatistics(props:Props) {
+import { Statistics } from "../Types/types";
+import { MutableRefObject } from "react";
+type Props = {
+  restart: () => void;
+  statistics: Statistics;
+  roundCounter: number;
+  timeToType: number;
+  seconds: MutableRefObject<number>;
+};
+export default function TypingStatistics(props: Props) {
   return (
     <>
       <section className=" w-full h-full flex flex-row sm:space-x-12 space-x-4 justify-center items-center pb-16">
@@ -40,7 +47,7 @@ export default function TypingStatistics(props:Props) {
           </span>
         </motion.div>
       </section>
-      {/* Round Details */}
+      {/* Round Statistics I caDetails */}
       <section className=" w-full 2xl:px-96 xl:px-80 lg:px-64 md:px-28 sm:px-12 flex flex-col space-y-2">
         <StatisticsTab
           statistics={props.statistics}
