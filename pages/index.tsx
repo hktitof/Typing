@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import TimerSpan from "../components/timer/TimerSpan";
 import Footer from "../components/Footer/Footer";
 import TypingStatistics from "../components/Statistics/TypingStatistics";
-import { getData, calculateWpm, calculateAccuracy } from "../components/Functions/functions";
+import { getData, calculateWpm, calculateAccuracy, handleOnChangeInput } from "../components/Functions/functions";
 import CursorCarrotComp from "../components/CursorCarotComp/CursorCarotComp";
 type ActiveWordWithIndex = {
   wordIndex: number;
@@ -16,8 +16,6 @@ type ActiveWordWithIndex = {
 type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPosition: number }];
 type wordsStatus = [{ word: string; indexFrom: number; indexTo: number }?];
 type Statistics = [{ round: number; wpm: number; accuracy: number }?];
-
-
 
 let keyboardEvent; // this variable will hold the keyboard event;
 let eventInputLostFocus; //  this variable will hold the event that will be fired when window is resizing & input lost focus
@@ -41,7 +39,7 @@ export default function Home() {
   const restart = useCallback(() => {
     document.removeEventListener("keydown", keyboardEvent);
     console.log("event Listener is Removed!!!!!!!!!!");
-    seconds.current = timeToType;// update the seconds to default value again
+    seconds.current = timeToType; // update the seconds to default value again
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
     if (inputRef.current?.value) {
@@ -123,70 +121,13 @@ export default function Home() {
     }
   }, [inputLostFocus]);
 
-  const handleOnChangeInput = (input: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    /**
-     * @nextForLoop
-     * this for loop to give the char its default color back, starting from activeWord first char index
-     * this loop will help  when user delete a character
-     */
-    for (let j = activeWordWithIndex.wordDetail.indexFrom; j < myText[1].length; j++) {
-      myText[1][j].charColor = "text-gray-500";
-    }
 
-    // start validating from this index CharIndex initial
-    let targetWordIndexIncrement = activeWordWithIndex.wordDetail.indexFrom;
-    for (let i = 0; i < input.length; i++) {
-      myText[1][targetWordIndexIncrement].charColor =
-        input[i] === myText[1][targetWordIndexIncrement].char ? "text-AAsecondary" : "text-AAError";
-      // if (input[i] === myText[1][targetWordIndexIncrement].char) {
-      //   myText[1][targetWordIndexIncrement].charColor = "text-AAsecondary";
-      // } else {
-      //   myText[1][targetWordIndexIncrement].charColor = "text-AAError";
-      // }
-      targetWordIndexIncrement++;
-    }
-    // checks if input is equal to the active word ( true => set inputValue to "" )
-    if (input.localeCompare(activeWordWithIndex.wordDetail.word) == 0) {
-      const nextWordIndex = activeWordWithIndex.wordIndex + 1;
-      setActiveWordWithIndex({
-        wordIndex: nextWordIndex,
-        wordDetail: myText[0][nextWordIndex],
-      });
-      event.target.value = ""; // clear the input
-    }
-
-    // set the cursor position to next target Char that will be typed of the active word
-    /**
-     * @note : normal for loop is used here to break the loop
-     */
-    for (let i = 0; i < myText[1].length; i++) {
-      if (myText[1][i].charColor.localeCompare("text-gray-500") == 0) {
-        myText[2].CursorPosition = i;
-        break;
-      }
-    }
-    setMyText([...myText]); // update the state
-    // Checking if the user finished typing by checking if the last char gray color is changed!
-    if (!(myText[1][myText[1].length - 1].charColor === "text-gray-500")) {
-      console.log("Player Finished typing!!");
-      updateStatistics(); // update statistics
-      /**
-       * @note :  next line will prevent from showing the previous text when user restarts
-       *  by checking !(myText[1].length==0)
-       */
-      myText[1] = [];
-      setMyText([...myText]);
-      setIsFinished(true);
-      clearInterval(timerCountingInterval.current); // stop the timer
-    }
-  };
-
-  console.log("rounded Count : ", roundCounter);
-  console.log("page re-rendered...");
-  console.log("data : ", myText);
-  console.log("Active Word : ", activeWordWithIndex);
-  console.log("CursorPosition : ", myText[2].CursorPosition);
-  console.log("rendering Finished-----------------------------");
+  // console.log("rounded Count : ", roundCounter);
+  // console.log("page re-rendered...");
+  // console.log("data : ", myText);
+  // console.log("Active Word : ", activeWordWithIndex);
+  // console.log("CursorPosition : ", myText[2].CursorPosition);
+  // console.log("rendering Finished-----------------------------");
 
   return (
     <div
@@ -211,7 +152,7 @@ export default function Home() {
                   <span className="text-gray-400 font-mono">Click to continue..</span>
                 </div>
               )}
-              {/* Above Text : Timer and Word Per Minute */}
+              {/* Text : Timer and Word Per Minute */}
               <div className="w-full flex justify-between pb-8">
                 <span className="text-gray-400 md:text-xl text-sm ">
                   {seconds.current == timeToType ? "0" : calculateWpm(myText[1], timeToType - seconds.current)} wpm
@@ -232,7 +173,6 @@ export default function Home() {
                   // console.log("DOM Showing words......");
                   return (
                     <div key={index} className="flex ">
-                      
                       {item.word.split("").map((char, i) => {
                         if (
                           char.localeCompare(" ") == 0 &&
@@ -284,7 +224,17 @@ export default function Home() {
                   className="w-0 h-0 bg-AAprimary text-xl text-center text-gray-600  border-b-gray-600
                   py-2 px-4 focus:outline-none "
                   onChange={e => {
-                    handleOnChangeInput(e.target.value, e);
+                    handleOnChangeInput(
+                      e.target.value,
+                      e,
+                      activeWordWithIndex,
+                      setActiveWordWithIndex,
+                      myText,
+                      setMyText,
+                      setIsFinished,
+                      timerCountingInterval,
+                      updateStatistics
+                    );
                   }}
                   onKeyDownCapture={e => {
                     // prevent cursor in input from jumping two characters
