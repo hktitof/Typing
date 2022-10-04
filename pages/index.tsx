@@ -1,34 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import TimerSpan from "../components/timer/TimerSpan";
 import Footer from "../components/Footer/Footer";
 import TypingStatistics from "../components/Statistics/TypingStatistics";
 import { getData, calculateWpm, calculateAccuracy, handleOnChangeInput } from "../components/Functions/functions";
 import CursorCarrotComp from "../components/CursorCarotComp/CursorCarotComp";
-type ActiveWordWithIndex = {
-  wordIndex: number;
-  wordDetail: {
-    word: ReturnType<() => string>;
-    indexFrom: number;
-    indexTo: number;
-  };
-};
-type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPosition: number }];
-type wordsStatus = [{ word: string; indexFrom: number; indexTo: number }?];
-type Statistics = [{ round: number; wpm: number; accuracy: number }?];
+import {ActiveWordWithIndex, Data, Statistics} from "../components/Types/types";
 
-let keyboardEvent; // this variable will hold the keyboard event;
-let eventInputLostFocus; //  this variable will hold the event that will be fired when window is resizing & input lost focus
+
+let keyboardEvent; // this variable will hold the keyboard event callback function;
+let eventInputLostFocus; //  this variable will hold the event callback function that will be fired when window is resizing & input lost focus
 export default function Home() {
   //  this general state will hold the data
   const [myText, setMyText] = React.useState<Data>([[], [], { CursorPosition: 0 }]);
   // this state will hold the active word index and the word details
-  const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null);
-  const [roundCounter, setRoundCounter] = useState<number>(0);
-  const [isFinished, setIsFinished] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [activeWordWithIndex, setActiveWordWithIndex] = useState<ActiveWordWithIndex>(null); // this state will hold the active word with its index in the quote
+  const [roundCounter, setRoundCounter] = useState<number>(0); // this state will hold the round counter
+  const [isFinished, setIsFinished] = useState(false);// this state will hold when user finished typing
+  const inputRef = useRef<HTMLInputElement>(null);// user input Ref
   const textInputRef = useRef<HTMLDivElement>(null);
-  const absoluteTextINputRef = useRef<HTMLDivElement>(null);
+  const absoluteTextINputRef = useRef<HTMLDivElement>(null);// absolute div Ref when input Lost focus
   const [inputLostFocus, setInputLostFocus] = useState(false);
   const timeToType: number = 180; // default time to type
   const seconds = useRef<number>(timeToType); // this useRef will hold the remaining seconds to type
@@ -72,6 +62,7 @@ export default function Home() {
       window.removeEventListener("resize", eventInputLostFocus);
     }
   }, [inputLostFocus]);
+
   // this useEffect will be called when the component is rendered for the first time and will keep focus on input
   useEffect(() => {
     if (myText[0].length == 0) {
@@ -93,13 +84,13 @@ export default function Home() {
     };
   }, [restart]);
 
+  // add event listener when the user finished typing
   useEffect(() => {
     if (isFinished) {
       console.log("event Listener added!!!");
       document.addEventListener("keydown", keyboardEvent);
     }
-    console.log("useEffect add event listener and remove event listener");
-  }, [isFinished, restart]);
+  }, [isFinished]);
 
   // this will handle new round conditions.
   useEffect(() => {
@@ -111,6 +102,8 @@ export default function Home() {
     setIsFinished(false); // set isFinished to false each time roundCounter changes that means each new round
     console.log("useEffect RoundCounter executed...");
   }, [roundCounter]);
+
+  // this useEffect will handle inputLostFocus state
   useEffect(() => {
     if (inputLostFocus) {
       if (absoluteTextINputRef.current?.style && inputLostFocus) {
@@ -120,7 +113,6 @@ export default function Home() {
       inputRef.current?.focus();
     }
   }, [inputLostFocus]);
-
 
   // console.log("rounded Count : ", roundCounter);
   // console.log("page re-rendered...");
@@ -207,7 +199,7 @@ export default function Home() {
                 })}
               </div>
               {/**
-               * @textInput
+               * @textInput : this is the input that the user will type on it, it's hidden and it's used to get the user input
                */}
               <div className="w-full flex justify-center">
                 <input
@@ -217,12 +209,13 @@ export default function Home() {
                   }}
                   ref={inputRef}
                   type="text"
-                  // ?INFORMATION: uncomment the following line to see the input
+                  // ?INFORMATIONAL : uncomment the following line to see the input
                   // className="w-52 bg-AAprimary text-xl text-center text-gray-600 border-b-2 border-b-gray-600
                   //           py-2 px-4 focus:outline-none "
 
                   className="w-0 h-0 bg-AAprimary text-xl text-center text-gray-600  border-b-gray-600
                   py-2 px-4 focus:outline-none "
+                  
                   onChange={e => {
                     handleOnChangeInput(
                       e.target.value,
@@ -243,7 +236,7 @@ export default function Home() {
                         inputRef.current.value.length,
                         inputRef.current.value.length + 1
                       );
-                      inputRef.current.focus();
+
                     }
                   }}
                 />

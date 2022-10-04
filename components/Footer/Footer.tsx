@@ -3,7 +3,8 @@ import GithubIcon from "../Icons/GithubIcon";
 import LinkedinIcon from "../Icons/LinkedinIcon";
 import InstagramIcon from "../Icons/InstagramIcon";
 import YoutubeIcon from "../Icons/YoutubeIcon";
-const ClickableIcon = props => {
+type Props={href:string,Icon:React.FC<{className:string}>}
+const ClickableIcon = (props:Props) => {
   return (
     <a href={props.href} className="" target={"_blank"} rel="noreferrer">
       <props.Icon
@@ -14,7 +15,7 @@ const ClickableIcon = props => {
     </a>
   );
 };
-type Props={link:string,className:string}
+
 export default function Fotter(props:{link:string,className:string}) {
   return (
       <div className={` ${props.className} bg-AAprimary flex flex-col justify-center items-center py-8 space-y-4 `}>

@@ -1,13 +1,4 @@
-type wordsStatus = [{ word: string; indexFrom: number; indexTo: number }?];
-type Data = [wordsStatus, [{ char: string; charColor: string }?], { CursorPosition: number }];
-type ActiveWordWithIndex = {
-  wordIndex: number;
-  wordDetail: {
-    word: ReturnType<() => string>;
-    indexFrom: number;
-    indexTo: number;
-  };
-};
+import { wordsStatus,Data,ActiveWordWithIndex } from "../Types/types";
 
 /**
  * @note use minLength & maxLength to limit the quote length
