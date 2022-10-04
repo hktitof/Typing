@@ -20,22 +20,21 @@ const getTopScore = (st: Statistics) => {
 
 const isTopScore = (index: number, statistics: Statistics) => {
   const result = getTopScore(statistics);
-  if (result == null) {
-    return <></>;
-  } else {
-    return index === result ? (
-      <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: [1, 0, 1] }}
-        transition={{ repeat: Infinity, duration: 1 }}
-        className="text-yellow-300"
-      >
-        TopScore
-      </motion.span>
-    ) : (
-      <></>
-    );
-  }
+  return result == null ? (
+    <></>
+  ) : index === result ? (
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [1, 0, 1] }}
+      transition={{ repeat: Infinity, duration: 1 }}
+      className="text-yellow-300"
+    >
+      TopScore
+    </motion.span>
+  ) : (
+    <></>
+  );
+ 
 };
 
 type Statistics = [{ round: number; wpm: number; accuracy: number }?];

@@ -24,6 +24,7 @@ export default function Home() {
   const seconds = useRef<number>(timeToType); // this useRef will hold the remaining seconds to type
   const timerCountingInterval = useRef(); // this useRef will hold the interval used in TimerSpan Component
   const [statistics, setStatistics] = useState<Statistics>([]); // this state will hold the statistics after user finish typing
+  const [isStartedTyping,seIsStartedTyping] = useState<boolean>(false); // this state will hold if user started typing
 
   //  this restart will be assigned again in each render only when roundCounter increase
   const restart = useCallback(() => {
@@ -32,6 +33,7 @@ export default function Home() {
     seconds.current = timeToType; // update the seconds to default value again
     getData(setMyText, setActiveWordWithIndex, setRoundCounter, roundCounter);
     setActiveWordWithIndex(null);
+    seIsStartedTyping(false);
     if (inputRef.current?.value) {
       inputRef.current.value = "";
     }
@@ -144,8 +146,8 @@ export default function Home() {
                   <span className="text-gray-400 font-mono">Click to continue..</span>
                 </div>
               )}
-              {/* Text : Timer and Word Per Minute */}
-              <div className="w-full flex justify-between pb-8">
+              {/* Text : Wpm & Timer */}
+              {isStartedTyping && <div className="w-full flex justify-between pb-8">
                 <span className="text-gray-400 md:text-xl text-sm ">
                   {seconds.current == timeToType ? "0" : calculateWpm(myText[1], timeToType - seconds.current)} wpm
                 </span>
@@ -156,7 +158,8 @@ export default function Home() {
                   timerCountingInterval={timerCountingInterval}
                   updateStatistics={updateStatistics}
                 />
-              </div>
+              </div>}
+              
               <div
                 className="lg:text-3xl md:text-xl sm:text-xl hover:cursor-pointer flex flex-wrap px-2 "
                 onClick={() => inputRef.current.focus()}
@@ -217,6 +220,9 @@ export default function Home() {
                   py-2 px-4 focus:outline-none "
                   
                   onChange={e => {
+                    if(isStartedTyping==false){
+                      seIsStartedTyping(true);
+                    }
                     handleOnChangeInput(
                       e.target.value,
                       e,
