@@ -1,34 +1,158 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Read Me
 
-## Getting Started
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
+![Project Image](https://user-images.githubusercontent.com/62770500/193928007-3d46e6c7-0478-4c94-b99c-22186800751b.png)
+![Project Image](https://user-images.githubusercontent.com/62770500/193928451-529ec6ea-d064-4674-8ed3-a8dc69934b65.png)
+
+---
+
+### Project Name :
+
+- Speed Typing
+
+---
+
+### Project Link :
+
+- Speed Typing - [click here](https://lovely-biscotti-5ba7b3.netlify.app/)
+
+---
+
+### Table of Contents
+
+- [Description](#description)
+- [How To Use](#how-to-use)
+- [References](#references)
+- [License](#license)
+- [Author Info](#author-info)
+
+---
+
+## Description
+
+Most jobs do not explicitly require certain typing speeds, but that's because basic typing skills are taken as a given. Thus, you should aim for a typing speed of at least 40 WPM to keep up a standard level of efficiency at work..However this project aim to help you to improve your typing speed by tracking your progress in each round and give you a score based on your typing speed and accuracy through a table of statistics.
+
+---
+
+## Technologies & libraries
+
+- Next.js
+- framer-motion
+- Tailwind CSS
+- ---
+ 
+## Functionalities
+- Stop Timer when the user stopped focus on typing 
+- Restart Typing by a keyboard Shortcut (Mac : Cmd + / OR Windows : Ctrl + /)
+- Tracking each round statistics through a table
+- Mobile Friendly
+
+
+
+
+
+---
+
+## How To Use
+
+#### Installation & Set Up
+##### Step 1 : cloning the repo to your local machine
+
+```sh
+    git clone https://github.com/hktitof/Typing
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+##### Step 2 : Dependencies installation
+in the root of the project "Typing", execute in your terminal the command "***yarn***"
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+###### ***Note: make sure you installed node & yarn package manager***
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+##### Step 3 : Start the development server
 
-## Learn More
+```sh
+    yarn dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+#### 🚀 Building and Running for Production
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Generate a full static production build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+   ```sh
+   yarn build
+   ```
+---
+## API Description :
+##### Endpoint 1 :
+the following endpoint will return a json object contains "quote" and "author", for current project i displayed only the quote, **minLength** is the minimum of characters.  
 
-## Deploy on Vercel
+```api
+    /api/typing/[minLength]
+```
+##### notes : 
+- ***minLength*** should be between 10 - 300.
+- the returned quote is a chain of 
+- i costumized the original Endpoint using The API Route of Nextjs, here is the Original Endpoint.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+##### Original Endpiont :
+###### URL : 
+```api
+    https://api.quotable.io/random?minLength=[minLength]
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+example :
+
+```api
+    /api/userInfoByIP/150
+```
+###### ***Get Request to above endpoint will return the following json data :***
+```JavaScript
+    {"quote":"Technology… is a queer thing. It brings you great gifts with one hand, and it stabs you in the back with the other.","author":"carrie-snow"}
+```
+---
+
+### 🎨 Color Reference
+
+- ![#64FFDA](https://via.placeholder.com/15/64FFDA/64FFDA.png)`#64FFDA`
+- ![#0A192F](https://via.placeholder.com/15/0A192F/0A192F.png) `#0A192F`
+- ![#D1D5DB](https://via.placeholder.com/15/D1D5DB/D1D5DB.png) `#D1D5DB`
+
+
+---
+
+## License
+
+MIT License
+
+Copyright (c) [2022] [Abdellatif Anaflous]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+---
+
+## Author Info
+
+- Linkedin - [@abdellatif-anaflous](https://www.linkedin.com/in/abdellatif-anaflous/)
+- Website - [Abdellatif Anaflous](https://anaflous.com)
+
+[Back To The Top](#description) :
+
