@@ -33,13 +33,16 @@
 
 Most jobs do not explicitly require certain typing speeds, but that's because basic typing skills are taken as a given. Thus, you should aim for a typing speed of at least 40 WPM to keep up a standard level of efficiency at work..However this project aim to help you to improve your typing speed by tracking your progress in each round and give you a score based on your typing speed and accuracy through a table of statistics.
 
+The project might seems at the beginning easy to build but believe me, there are a ton of logics under the hook, at some point before starting building the project, i thought it may took maximum 1 week, at the end it turns out more than 20 days to build it with a clean code, note that first commits implementation of the project were locally meaning outside of Github.
+
 ---
 
 ## Technologies & libraries
 
 - Next.js
-- framer-motion
+- TypeScript
 - Tailwind CSS
+- framer-motion
 - ---
  
 ## Functionalities
