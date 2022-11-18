@@ -37,6 +37,18 @@ The project might seems at the beginning easy to build but believe me, there are
 
 ---
 
+## 📌Contribution :
+Contribution to this repos are always welcome. You can alwas upgrade the UI, or fix any bug predefined in the issue section.
+
+For new contibution or feature :
+
+1. Open a new issue describing the feature.
+2. Add feature tag to this issue.
+3. Get acceptance from the code maintainers
+4. Enjoy adding the feature
+
+---
+
 ## Technologies & libraries
 
 - Next.js
