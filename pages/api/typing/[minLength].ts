@@ -1,28 +1,33 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import rateLimit from "express-rate-limit";
-import https from "https";
 import DOMPurify from "isomorphic-dompurify";
 
-// Rate limiting configuration
+// Fixed Rate Limiting Configuration
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  max: 100,
+  keyGenerator: req => {
+    // Get IP from headers (Vercel/Next.js specific)
+    const forwardedFor = req.headers["x-forwarded-for"];
+    const ip = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor?.split(",")[0];
+    return ip || req.socket.remoteAddress || "unknown-ip";
+  },
+  handler: (_, res) => {
+    res.status(429).json({ error: "Too many requests" });
+  },
+  validate: {
+    trustProxy: true, // Trust Vercel proxy
+  },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Secure HTTPS agent
-const secureAgent = new https.Agent({
-  rejectUnauthorized: true,
-  keepAlive: true,
-});
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    // Apply rate limiting
+    // Apply rate limiting with proper typing
     await new Promise<void>((resolve, reject) => {
-      limiter(req as any, res as any, err => {
-        return err ? reject(err) : resolve();
+      limiter(req as any, res as any, (err?: unknown) => {
+        err ? reject(err) : resolve();
       });
     });
 
@@ -87,7 +92,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(cleanData);
   } catch (err) {
-    // Secure error handling
     console.error("API Error:", err);
     const safeError = err instanceof Error ? err.message : "Unknown error";
     return res.status(500).json({ error: "Failed to fetch quote" });
